@@ -5,6 +5,8 @@ VisualStudioVersion = 17.2.32630.192
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Project1", "Project1\Project1.vcxproj", "{D4111866-6DD4-43E1-AB1D-F2A6E14837DA}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FlappyBird", "FlappyBird\FlappyBird.vcxproj", "{6AF48AE9-012E-4FDE-B92D-1955163B134E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -21,6 +23,14 @@ Global
 		{D4111866-6DD4-43E1-AB1D-F2A6E14837DA}.Release|x64.Build.0 = Release|x64
 		{D4111866-6DD4-43E1-AB1D-F2A6E14837DA}.Release|x86.ActiveCfg = Release|Win32
 		{D4111866-6DD4-43E1-AB1D-F2A6E14837DA}.Release|x86.Build.0 = Release|Win32
+		{6AF48AE9-012E-4FDE-B92D-1955163B134E}.Debug|x64.ActiveCfg = Debug|x64
+		{6AF48AE9-012E-4FDE-B92D-1955163B134E}.Debug|x64.Build.0 = Debug|x64
+		{6AF48AE9-012E-4FDE-B92D-1955163B134E}.Debug|x86.ActiveCfg = Debug|Win32
+		{6AF48AE9-012E-4FDE-B92D-1955163B134E}.Debug|x86.Build.0 = Debug|Win32
+		{6AF48AE9-012E-4FDE-B92D-1955163B134E}.Release|x64.ActiveCfg = Release|x64
+		{6AF48AE9-012E-4FDE-B92D-1955163B134E}.Release|x64.Build.0 = Release|x64
+		{6AF48AE9-012E-4FDE-B92D-1955163B134E}.Release|x86.ActiveCfg = Release|Win32
+		{6AF48AE9-012E-4FDE-B92D-1955163B134E}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

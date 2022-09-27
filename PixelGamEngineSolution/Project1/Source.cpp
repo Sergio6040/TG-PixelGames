@@ -1,4 +1,3 @@
-
 #define OLC_PGE_APPLICATION
 #include "olcPixelGameEngine.h"
 
@@ -31,7 +30,7 @@ public:
 int main()
 {
 	Example demo;
-	if (demo.Construct(256, 240, 4, 4))
+	if (demo.Construct(64, 64, 16, 16))
 		demo.Start();
 
 	return 0;
