@@ -132,6 +132,34 @@
   <ItemGroup>
     <ClCompile Include="Source.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <Image Include="..\FlappyBird\sprites\0.png" />
+    <Image Include="..\FlappyBird\sprites\1.png" />
+    <Image Include="..\FlappyBird\sprites\2.png" />
+    <Image Include="..\FlappyBird\sprites\3.png" />
+    <Image Include="..\FlappyBird\sprites\4.png" />
+    <Image Include="..\FlappyBird\sprites\5.png" />
+    <Image Include="..\FlappyBird\sprites\6.png" />
+    <Image Include="..\FlappyBird\sprites\7.png" />
+    <Image Include="..\FlappyBird\sprites\8.png" />
+    <Image Include="..\FlappyBird\sprites\9.png" />
+    <Image Include="..\FlappyBird\sprites\background-day.png" />
+    <Image Include="..\FlappyBird\sprites\background-night.png" />
+    <Image Include="..\FlappyBird\sprites\base.png" />
+    <Image Include="..\FlappyBird\sprites\bluebird-downflap.png" />
+    <Image Include="..\FlappyBird\sprites\bluebird-midflap.png" />
+    <Image Include="..\FlappyBird\sprites\bluebird-upflap.png" />
+    <Image Include="..\FlappyBird\sprites\gameover.png" />
+    <Image Include="..\FlappyBird\sprites\message.png" />
+    <Image Include="..\FlappyBird\sprites\pipe-green.png" />
+    <Image Include="..\FlappyBird\sprites\pipe-red.png" />
+    <Image Include="..\FlappyBird\sprites\redbird-downflap.png" />
+    <Image Include="..\FlappyBird\sprites\redbird-midflap.png" />
+    <Image Include="..\FlappyBird\sprites\redbird-upflap.png" />
+    <Image Include="..\FlappyBird\sprites\yellowbird-downflap.png" />
+    <Image Include="..\FlappyBird\sprites\yellowbird-midflap.png" />
+    <Image Include="..\FlappyBird\sprites\yellowbird-upflap.png" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
