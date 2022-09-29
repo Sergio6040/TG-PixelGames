@@ -11,6 +11,9 @@ public:
 	olc::Sprite* sDemo = nullptr;
 	olc::Decal* dec = nullptr;
 
+	olc::Sprite* sDemo2 = nullptr;
+	olc::Decal* dec2 = nullptr;
+
 public:
 	bool OnUserCreate() override
 	{
@@ -18,6 +21,11 @@ public:
 
 		sDemo = new olc::Sprite("./sprites/redbird-downflap.png");
 		dec = new olc::Decal(sDemo);
+
+
+		sDemo2 = new olc::Sprite("./sprites/background-day.png");
+		dec2 = new olc::Decal(sDemo2);
+		
 
 		return true;
 	}
@@ -31,9 +39,16 @@ public:
 
 		Clear(olc::VERY_DARK_BLUE);
 
+		DrawDecal(olc::vf2d(0, 0), dec2, { 0.15f, 0.15f });
+
 		olc::vf2d mouse = { float(GetMouseX()), float(GetMouseY()) };
 
+		/*SetPixelMode(olc::Pixel::ALPHA);
 		DrawSprite(mouse, sDemo);
+		SetPixelMode(olc::Pixel::NORMAL);*/
+
+		DrawDecal(mouse, dec, {0.2f, 0.2f}, olc::Pixel(255, 255, 0, 64));
+
 		return true;
 	}
 };
@@ -42,7 +57,7 @@ public:
 int main()
 {
 	Example demo;
-	if (demo.Construct(64, 64, 16, 16))
+	if (demo.Construct(40, 60, 16, 16))
 		demo.Start();
 
 	return 0;
