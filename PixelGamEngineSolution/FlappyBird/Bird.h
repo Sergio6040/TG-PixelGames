@@ -10,7 +10,7 @@ private:
 	float VelocityY = 0.0f;
 	float AccelerationY = 0.0f;
 
-	float JumpForce = 3.0f;
+	float JumpForce = 5.0f;
 
 	olc::Sprite* UpImage = nullptr;
 	olc::Decal* UpSprite = nullptr;
