@@ -82,7 +82,33 @@ public:
 			}
 		}
 
-		//Draw ship
+		//Draw ship?
+		float Mx[3] = { 0.0f, -2.5f, 2.5f };
+		float My[3] = { -5.5f, 2.5f, 2.5f };
+		
+		float Sx[3];
+		float Sy[3];
+
+		//rotate
+		for (int i = 0; i < 3; i++)
+		{
+			Sx[i] = Mx[i] * cosf(Player.Angle) - My[i] * sinf(Player.Angle);
+			Sy[i] = Mx[i] * sinf(Player.Angle) + My[i] * cosf(Player.Angle);
+		}
+
+		//translate
+		for (int i = 0; i < 3; i++)
+		{
+			Sx[i] += Player.X;
+			Sy[i] += Player.Y;
+		}
+
+		//Draw triangle
+		for (int i = 0; i < 4; i++)
+		{
+			int j = (i + 1);
+			DrawLine(Sx[i % 3], Sy[i % 3], Sx[j % 3], Sy[j % 3]);
+		}
 
 		return true;
 	}
