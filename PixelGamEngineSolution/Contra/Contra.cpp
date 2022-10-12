@@ -19,11 +19,21 @@ private:
     int LevelWidth;
     int LevelHeight;
 
-    float CameraX;
-    float CameraY;
+    class FPlayer
+    {
+    public:
+        float X = 1.0f;
+        float Y = 1.0f;
+        float VelX = 0.f;
+        float VelY = 0.f;
+        bool bOnGround = false;
+        int Direction = 1;
+    };
 
-    float PlayerX;
-    float PlayerY;
+    float CameraX = 0.0f;
+    float CameraY = 0.0f;
+    
+    FPlayer Player;
 
 public:
     virtual bool OnUserCreate() override
@@ -33,13 +43,13 @@ public:
 
         LevelWidth = 108;
         LevelHeight = 7;
-        Level += L"101010101010101010101010101010101010101001010101010101010101010101010101010101010101011010101010101010101010";
-        Level += L"010101010101010101010101010101010101010100101010101010101010101010101010101010101010101101010101010101010101";
-        Level += L"101010101010101010101010101010101010101001010101010101010101010101010101010101010101011010101010101010101010";
-        Level += L"010101010101010101010101010101010101010100101010101010101010101010101010101010101010101101010101010101010101";
-        Level += L"101010101010101010101010101010101010101001010101010101010101010101010101010101010101011010101010101010101010";
-        Level += L"010101010101010101010101010101010101010100101010101010101010101010101010101010101010101101010101010101010101";
-        Level += L"101010101010101010101010101010101010101001010101010101010101010101010101010101010101011010101010101010101010";
+        Level += L"000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000";
+        Level += L"000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000";
+        Level += L"000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000";
+        Level += L"011111111111111111111111111111000000000000000000000000000000000000000000000000000000000000000000000000000000";
+        Level += L"000011100001100000100000000111000000000000000000000000000000000000000000000000000000000000000000000000000000";
+        Level += L"000000010010000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000";
+        Level += L"011111111111111111111111111100000000000000000000000000000000000000000000000000000000000000000000000000000000";
 
 
         return true;
@@ -47,7 +57,6 @@ public:
 
     virtual bool OnUserUpdate(float fElapsedTime) override
     {
-
         Clear(olc::BLACK);
 
         auto GetTile = [&](int x, int y)
@@ -70,18 +79,58 @@ public:
             }
         };
 
-        if(GetKey(olc::RIGHT).bPressed)
+        if(IsFocused())
         {
-            PlayerX += 1;
-        }
-        if(GetKey(olc::LEFT).bPressed)
-        {
-            PlayerX -= 1;
+            if(GetKey(olc::UP).bHeld)
+            {
+                Player.VelY = -6.0f;
+            }
+            if(GetKey(olc::DOWN).bHeld)
+            {
+                //crouch
+                Player.VelY = 6.0f;
+            }
+            if(GetKey(olc::LEFT).bHeld)
+            {
+                Player.VelX += (Player.bOnGround ? -25.0f : -15.0f) * fElapsedTime;
+                Player.Direction = -1;
+            }
+            if(GetKey(olc::RIGHT).bHeld)
+            {
+                Player.VelX += (Player.bOnGround ? 25.0f : 15.0f) * fElapsedTime;
+                Player.Direction = 1;
+            }
         }
 
+        // Player.VelY += 20.f * fElapsedTime;
+        
+        //drag?
+        // if(Player.bOnGround)
+        // {
+        //     Player.VelX += -3.0 * Player.VelX * fElapsedTime;
+        //     if(fabs(Player.VelX) < 0.01f)
+        //     {
+        //         Player.VelX = 0.0f;
+        //     }
+        // }
+        //
+        //clamp 
+        if(Player.VelX > 10.f) Player.VelX = 10.0f;
+        if(Player.VelX < -10.f) Player.VelX = -10.0f;
+        if(Player.VelY > 100.f) Player.VelY = 100.0f;
+        if(Player.VelX < -100.f) Player.VelY = -100.0f;
 
-        CameraX = PlayerX;
-        CameraY = PlayerY;
+        //calculate Potencial new position
+        float NewPlayerPosX = Player.X + Player.VelX * fElapsedTime;
+        float NewPlayerPosY = Player.Y + Player.VelY * fElapsedTime;
+
+        //apply new position
+        Player.X = NewPlayerPosX;
+        Player.Y = NewPlayerPosY;
+
+        //link Camera to player position
+        CameraX = Player.X;
+        CameraY = Player.Y;
 
         int TileWidth = 32;
         int TileHeight = 32;
@@ -123,8 +172,12 @@ public:
             }
         }
 
-        DrawDecal({0.f, 0.f}, BackGroundDecal);
+        // DrawDecal({0.f, 0.f}, BackGroundDecal);
 
+
+        //Draw Player
+        FillRect((Player.X - OffSetX) * TileWidth, (Player.Y - OffSetY) * TileHeight, 16, 48);
+        
         
         return true;
     }
