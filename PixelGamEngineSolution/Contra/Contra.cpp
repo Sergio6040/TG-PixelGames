@@ -33,15 +33,22 @@ public:
 
         LevelWidth = 108;
         LevelHeight = 7;
-        Level += L"000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000";
-        Level += L"000000010000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000";
-        Level += L"000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000";
-        Level += L"000000000000000000000000001111111111000000000000000000000000000000000000000000000000000000000000000000000000";
-        Level += L"000000000000000000000000010000000000100000000000000000000000000000000000000000000000000000000000000000000000";
-        Level += L"000000000000000000000000100000000000010000000000000000000000000000000000000000000000000000000000000000000000";
-        Level += L"111111111111111111111111000000000000001111111111111111111111111111000000000000000111111111000000000000011111";
+        /*
+         *  . -> Nothing
+         *  G -> Ground
+         *  B -> Bridge
+         *  W -> Water
+         * 
+         */
+        Level += L"............................................................................................................";
+        Level += L"............................................................................................................";
+        Level += L"............................................................................................................";
+        Level += L".GGGGGGGGGGGGGGGGGGGGGGG....................................................................................";
+        Level += L".....GGG.....GG.............................................................................................";
+        Level += L"........G..G........GGG.....................................................................................";
+        Level += L"WWWWWWWWWGGWWWWWWWWGGWWWWWWWWWWWWWWWWWWWWWWWGGGWWWWWWWGGGGGG.............G...G....G......GGG......GGGGGGGGGG";
 
-        Player = FPlayer(0, 0);
+        Player = FPlayer(1,0);
         
         return true;
     }
@@ -72,7 +79,7 @@ public:
 
         if(Player.GetVelocity_Y() <= 0) //jumping
         {
-            if(GetTile(Player.GetX(), Player.GetY()) != L'1' || GetTile(Player.GetX() + 0.9f, Player.GetY()) != L'1')
+            if(GetTile(Player.GetX(), Player.GetY()) != L'G' || GetTile(Player.GetX() + 0.9f, Player.GetY()) != L'G')
             {
                 Player.SetY((int)Player.GetX() + 1);
                 Player.SetVelocity_Y(0.0f);
@@ -81,7 +88,7 @@ public:
         else //moving down
         {
             auto MyTile = GetTile(Player.GetX(), Player.GetY());
-            if(GetTile(Player.GetX(), Player.GetY() + 1) == L'1' || GetTile(Player.GetX() + 0.9f, Player.GetY() + 1) == L'1')
+            if(GetTile(Player.GetX(), Player.GetY() + 1) == L'G' || GetTile(Player.GetX() + 0.9f, Player.GetY() + 1) == L'G')
             {
                 Player.SetY((int)Player.GetY());
                 Player.SetVelocity_Y(0);
@@ -170,12 +177,16 @@ public:
                 wchar_t TileId = GetTile(x + OffSetX, y + OffSetY);
                 if (TileId == '0')
                 {
-                    FillRect(x * TileWidth - TileOffsetX, y * TileHeight - TileOffsetY, 32, 32, olc::GREEN);
+                    FillRect(x * TileWidth - TileOffsetX, y * TileHeight - TileOffsetY, 32, 32, olc::CYAN);
                     // DrawPartialDecal();
                 }
-                else if (TileId == '1')
+                else if (TileId == 'G')
                 {
                     FillRect(x * TileWidth - TileOffsetX, y * TileHeight - TileOffsetY, 32, 32, olc::RED);
+                }
+                else if (TileId == 'W')
+                {
+                    FillRect(x * TileWidth - TileOffsetX, y * TileHeight - TileOffsetY, 32, 32, olc::BLUE);
                 }
                 else
                 {
