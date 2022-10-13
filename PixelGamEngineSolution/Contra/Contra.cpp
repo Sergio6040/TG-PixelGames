@@ -1,5 +1,6 @@
 #define OLC_PGE_APPLICATION
 #include "olcPixelGameEngine.h"
+#include "Player.h"
 
 class Example : public olc::PixelGameEngine
 {
@@ -19,17 +20,6 @@ private:
     int LevelWidth;
     int LevelHeight;
 
-    class FPlayer
-    {
-    public:
-        float X = 1.0f;
-        float Y = 1.0f;
-        float VelX = 0.f;
-        float VelY = 0.f;
-        bool bOnGround = false;
-        int Direction = 1;
-    };
-
     float CameraX = 0.0f;
     float CameraY = 0.0f;
     
@@ -44,113 +34,135 @@ public:
         LevelWidth = 108;
         LevelHeight = 7;
         Level += L"000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000";
+        Level += L"000000010000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000";
         Level += L"000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000";
-        Level += L"000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000";
-        Level += L"011111111111111111111111111111000000000000000000000000000000000000000000000000000000000000000000000000000000";
-        Level += L"000011100001100000100000000111000000000000000000000000000000000000000000000000000000000000000000000000000000";
-        Level += L"000000010010000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000";
-        Level += L"011111111111111111111111111100000000000000000000000000000000000000000000000000000000000000000000000000000000";
+        Level += L"000000000000000000000000001111111111000000000000000000000000000000000000000000000000000000000000000000000000";
+        Level += L"000000000000000000000000010000000000100000000000000000000000000000000000000000000000000000000000000000000000";
+        Level += L"000000000000000000000000100000000000010000000000000000000000000000000000000000000000000000000000000000000000";
+        Level += L"111111111111111111111111000000000000001111111111111111111111111111000000000000000111111111000000000000011111";
 
-
+        Player = FPlayer(0, 0);
+        
         return true;
     }
 
+    auto GetTile(const int TileX, const int TileY) const
+    {
+        if(TileX >= 0 && TileX < LevelWidth && TileY >= 0 && TileY < LevelHeight)
+        {
+            return Level[TileY * LevelWidth + TileX];
+        }
+        else
+        {
+            return L' ';
+        }
+    }
+
+    void SetTile(const int TileX, const int TileY, wchar_t Character)
+    {
+        if(TileX >= 0 && TileX < LevelWidth && TileY >= 0 && TileY < LevelHeight)
+        {
+            Level[TileY * LevelWidth + TileX] = Character;
+        }
+    }
+
+    void GroundCollision()
+    {
+        Player.SetOnGround(false);
+
+        if(Player.GetVelocity_Y() <= 0) //jumping
+        {
+            if(GetTile(Player.GetX(), Player.GetY()) != L'1' || GetTile(Player.GetX() + 0.9f, Player.GetY()) != L'1')
+            {
+                Player.SetY((int)Player.GetX() + 1);
+                Player.SetVelocity_Y(0.0f);
+            }
+        }
+        else //moving down
+        {
+            auto MyTile = GetTile(Player.GetX(), Player.GetY());
+            if(GetTile(Player.GetX(), Player.GetY() + 1) == L'1' || GetTile(Player.GetX() + 0.9f, Player.GetY() + 1) == L'1')
+            {
+                Player.SetY((int)Player.GetY());
+                Player.SetVelocity_Y(0);
+                Player.SetOnGround(true);
+            }
+        }
+        
+    }
+    
     virtual bool OnUserUpdate(float fElapsedTime) override
     {
         Clear(olc::BLACK);
-
-        auto GetTile = [&](int x, int y)
-        {
-            if(x >= 0 && x < LevelWidth && y >= 0 && y < LevelHeight)
-            {
-                return Level[y * LevelWidth + x];
-            }
-            else
-            {
-                return L' ';
-            }
-        };
-
-        auto SetTile = [&](int x, int y, wchar_t c)
-        {
-            if(x >= 0 && x < LevelWidth && y >= 0 && y < LevelHeight)
-            {
-                Level[y * LevelWidth + x] = c;
-            }
-        };
 
         if(IsFocused())
         {
             if(GetKey(olc::UP).bHeld)
             {
-                Player.VelY = -6.0f;
+                //lookUp
+                // Player.SetVelocity_Y(-6.0);
             }
             if(GetKey(olc::DOWN).bHeld)
             {
                 //crouch
-                Player.VelY = 6.0f;
+                // Player.SetVelocity_Y(-6.0);
+                if(GetKey(olc::X).bPressed)
+                {
+                    //Get down
+                }
             }
             if(GetKey(olc::LEFT).bHeld)
             {
-                Player.VelX += (Player.bOnGround ? -25.0f : -15.0f) * fElapsedTime;
-                Player.Direction = -1;
+                Player.SetVelocity_X(-2.0f);
+                Player.SetDirection(-1);
             }
             if(GetKey(olc::RIGHT).bHeld)
             {
-                Player.VelX += (Player.bOnGround ? 25.0f : 15.0f) * fElapsedTime;
-                Player.Direction = 1;
+                Player.SetVelocity_X(2.0f);
+                Player.SetDirection(1);
+            }
+            if(GetKey(olc::X).bPressed)
+            {
+                //jumpp
+                // if(Player.GetVelocity_Y() == 0)
+                // {
+                //     Player.AddToVelocity_Y(-10.0f);
+                // }
             }
         }
 
+        //Gravity
         // Player.VelY += 20.f * fElapsedTime;
+        //on Playermovement
         
-        //drag?
-        // if(Player.bOnGround)
-        // {
-        //     Player.VelX += -3.0 * Player.VelX * fElapsedTime;
-        //     if(fabs(Player.VelX) < 0.01f)
-        //     {
-        //         Player.VelX = 0.0f;
-        //     }
-        // }
-        //
-        //clamp 
-        if(Player.VelX > 10.f) Player.VelX = 10.0f;
-        if(Player.VelX < -10.f) Player.VelX = -10.0f;
-        if(Player.VelY > 100.f) Player.VelY = 100.0f;
-        if(Player.VelX < -100.f) Player.VelY = -100.0f;
+        Player.PlayerMovement(fElapsedTime);
+        GroundCollision();
 
-        //calculate Potencial new position
-        float NewPlayerPosX = Player.X + Player.VelX * fElapsedTime;
-        float NewPlayerPosY = Player.Y + Player.VelY * fElapsedTime;
-
-        //apply new position
-        Player.X = NewPlayerPosX;
-        Player.Y = NewPlayerPosY;
-
+        //---------------------------------------------------------------------------------
         //link Camera to player position
-        CameraX = Player.X;
-        CameraY = Player.Y;
-
+        CameraX = Player.GetX();
+        CameraY = 0.0f;
+        
+        //
         int TileWidth = 32;
         int TileHeight = 32;
-        int VisibleTilesX = ScreenWidth() / TileWidth;
-        int VisibleTilesY = ScreenHeight() / TileHeight;
-
+        int VisibleTilesX = ScreenWidth() / TileWidth; //8
+        int VisibleTilesY = ScreenHeight() / TileHeight; //7
+        
         float OffSetX = CameraX - (float)VisibleTilesX / 2.f;
-        float OffSetY = CameraY - (float)VisibleTilesY / 2.f;
-
+        float OffSetY = CameraY - (float)VisibleTilesY / 2.f;//no es necesario
+        
         //camera clamp
         if (OffSetX < 0) OffSetX = 0;
         if (OffSetY < 0) OffSetY = 0;
-        if (OffSetX > LevelWidth - VisibleTilesX) OffSetX = LevelWidth - VisibleTilesX;
+        if (OffSetX > LevelWidth - VisibleTilesX) OffSetX = LevelWidth - VisibleTilesX; //revisar!!!!
         if (OffSetY > LevelHeight - VisibleTilesY) VisibleTilesY = LevelHeight - VisibleTilesY;
-
+        
         //smooth offset
-        float fTileOffsetX = (OffSetX - (int)OffSetX) * TileWidth;
-        float fTileOffsetY = (OffSetY - (int)OffSetY) * TileHeight;
-
-        //Draw visible Tile map
+        float TileOffsetX = (OffSetX - (int)OffSetX) * TileWidth;
+        float TileOffsetY = (OffSetY - (int)OffSetY) * TileHeight;
+        
+        // //Draw visible Tile map
         for (int x = -1; x < VisibleTilesX + 1; x++)
         {
             for (int y = -1; y < VisibleTilesY + 1; y++)
@@ -158,16 +170,16 @@ public:
                 wchar_t TileId = GetTile(x + OffSetX, y + OffSetY);
                 if (TileId == '0')
                 {
-                    FillRect(x * TileWidth - OffSetX, y * TileHeight - OffSetY, 32, 32, olc::GREEN);
+                    FillRect(x * TileWidth - TileOffsetX, y * TileHeight - TileOffsetY, 32, 32, olc::GREEN);
                     // DrawPartialDecal();
                 }
                 else if (TileId == '1')
                 {
-                    FillRect(x * TileWidth - OffSetX, y * TileHeight - OffSetY, 32, 32, olc::RED);
+                    FillRect(x * TileWidth - TileOffsetX, y * TileHeight - TileOffsetY, 32, 32, olc::RED);
                 }
                 else
                 {
-                    FillRect(x * TileWidth - OffSetX, y * TileHeight - OffSetY, 32, 32);
+                    FillRect(x * TileWidth - TileOffsetX, y * TileHeight - TileOffsetY, 32, 32);
                 }
             }
         }
@@ -176,7 +188,7 @@ public:
 
 
         //Draw Player
-        FillRect((Player.X - OffSetX) * TileWidth, (Player.Y - OffSetY) * TileHeight, 16, 48);
+        FillRect((Player.GetX() - OffSetX) * TileWidth , (Player.GetY() - OffSetY) * TileHeight, 16, 48, olc::MAGENTA);
         
         
         return true;

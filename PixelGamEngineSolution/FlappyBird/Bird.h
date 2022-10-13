@@ -94,7 +94,7 @@ public:
 
 	//-----------------------------------------------------------------------------------
 
-	float GetAccelerationY()
+	float GetAccelerationY() const
 	{
 		return AccelerationY;
 	}
