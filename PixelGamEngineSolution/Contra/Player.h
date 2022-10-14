@@ -55,7 +55,11 @@ public:
 
     void Jump()
     {
-        // VelY += JumpForce 
+        // VelY += JumpForce
+        if(VelY == 0)
+        {
+            AddToVelocity_Y(-JumpForce);
+        }
     }
 
     //---------------------------------------------------------------------------------------------
