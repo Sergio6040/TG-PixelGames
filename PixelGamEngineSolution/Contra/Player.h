@@ -1,28 +1,27 @@
 #pragma once
-#include "olcPixelGameEngine.h"
+#include "GameObject.h"
 
-class FPlayer
+class FPlayer : public FGameObject
 {
 private:
-    float X;
-    float Y;
-    float VelX = 0.0f;
-    float VelY = 0.0f;
+    // float X = 0.0f;
+    // float Y = 0.0f;
+    // float VelX = 0.0f;
+    // float VelY = 0.0f;
     float JumpForce = 5.0f;
     float Gravity = 5.0f;
 
-    olc::vf2d Aim = {1.0f, 0.0f};
-
-    int Lives;
-    int Direction;
+    // olc::vf2d Aim = {1.0f, 0.0f};
+    //
+    // int Lives;
+    // int Direction;
     
     bool bOnGround = false;
-    bool bIsGhost;
+    bool bIsGhost = false;
     bool bCollidesGround = true;
 public:
-
     FPlayer() = default;
-
+    
     FPlayer(const float InX, const float InY)
     {
         X = InX;
@@ -57,7 +56,7 @@ public:
     void Jump()
     {
         // VelY += JumpForce
-        if(VelY == 0)
+        if(VelY == 0.0f)
         {
             AddToVelocity_Y(-JumpForce);
         }

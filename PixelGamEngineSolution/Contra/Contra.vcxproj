@@ -154,12 +154,18 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Contra.cpp" />
+    <ClCompile Include="Bullet.cpp" />
+    <ClCompile Include="GameObject.cpp" />
+    <ClCompile Include="InputHandler.cpp" />
+    <ClCompile Include="Main.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="Player.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Bullet.h" />
     <ClInclude Include="Game.h" />
+    <ClInclude Include="GameObject.h" />
+    <ClInclude Include="InputHandler.h" />
     <ClInclude Include="olcPixelGameEngine.h" />
     <ClInclude Include="Player.h" />
   </ItemGroup>
