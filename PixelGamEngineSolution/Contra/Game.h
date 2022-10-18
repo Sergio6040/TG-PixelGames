@@ -22,6 +22,7 @@ private:
     FPlayer Player ;
     FInputHandler Input = nullptr;
 
+    std::vector<FBullet> PlayerBullets;
 
 public:
 
@@ -132,6 +133,11 @@ public:
         }
     }
 
+    void Shoot(const float InX, const float InY)
+    {
+        PlayerBullets.push_back(FBullet(InX, InY, Player.GetAim()));
+    }
+
     bool OnUserUpdate(float fElapsedTime) override
     {
         Clear(olc::BLACK);
@@ -214,6 +220,17 @@ public:
         //attach to player hitbox
         const olc::vf2d Crosshair = {(aux.x * 10) + PlayerPos.x + 32.f/2, (aux.y * 10) + PlayerPos.y + 42.f/2};
         FillCircle(Crosshair, 1, olc::YELLOW);
+
+        if (GetKey(olc::Z).bPressed)
+        {
+            Shoot(Crosshair.x, Crosshair.y);   
+        }
+
+        for(FBullet& LoopBullet : PlayerBullets)
+        {
+            LoopBullet.UpdatePosition();
+            FillCircle(LoopBullet.X, LoopBullet.Y, 1, olc::RED);
+        }
 
 
         return true;

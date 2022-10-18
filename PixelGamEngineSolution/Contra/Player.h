@@ -1,24 +1,21 @@
 #pragma once
 #include "GameObject.h"
+#include "Bullet.h"
 
 class FPlayer : public FGameObject
 {
 private:
-    // float X = 0.0f;
-    // float Y = 0.0f;
-    // float VelX = 0.0f;
-    // float VelY = 0.0f;
+    
     float JumpForce = 5.0f;
     float Gravity = 5.0f;
 
-    // olc::vf2d Aim = {1.0f, 0.0f};
-    //
-    // int Lives;
-    // int Direction;
-    
     bool bOnGround = false;
     bool bIsGhost = false;
     bool bCollidesGround = true;
+
+    // const olc::vf2d Crosshair = {(Aim.x * 10) + PlayerPos.x + 32.f/2, (aux.y * 10) + PlayerPos.y + 42.f/2};
+
+
 public:
     FPlayer() = default;
     
@@ -62,6 +59,14 @@ public:
         }
     }
 
+    //---------------------------------------------------------------------------------------------
+
+    // void Shoot(std::vector<FBullet>& InBulletStorage)
+    // {
+    //     InBulletStorage.push_back(FBullet());
+    // }
+
+    
     //---------------------------------------------------------------------------------------------
     
     void ClampVelocities()
