@@ -22,6 +22,8 @@ private:
     float CameraX = 0.0f;
     float CameraY = 0.0f;
 
+    float GroundCounter = 0;
+
     FPlayer Player;
 
 public:
@@ -88,7 +90,7 @@ public:
         return (GetTile(Player.GetX() + X1, Player.GetY() + Y1) == Character || GetTile(Player.GetX() + X2, Player.GetY() + Y2) == Character);
     }
     
-    void GroundCollision()
+    void GroundCollision(const float fElapsedTime)
     {
         Player.SetOnGround(false);
 
@@ -107,9 +109,22 @@ public:
                 // GetTile(Player.GetX(), Player.GetY() + 1) == L'G' || GetTile(Player.GetX() + 0.9f, Player.GetY() + 1) == L'G' ||
                 // GetTile(Player.GetX(), Player.GetY() + 1) == L'B' || GetTile(Player.GetX() + 0.9f, Player.GetY() + 1) == L'B')
             {
-                Player.SetY((int)Player.GetY() + 0.4f);
-                Player.SetVelocity_Y(0);
-                Player.SetOnGround(true);
+                if(Player.GetCollidesGround())
+                {
+                    Player.SetY((int)Player.GetY() + 0.4f);
+                    Player.SetVelocity_Y(0);
+                    Player.SetOnGround(true);  
+                    GroundCounter = 0;
+                }
+                else
+                {
+                    GroundCounter += fElapsedTime;
+                    std::cout << GroundCounter << std::endl;
+                    if (GroundCounter > 0.65)
+                    {
+                        Player.SetCollidesGround(true);
+                    }
+                }
             }
         }
     }
@@ -122,37 +137,71 @@ public:
         {
             if (GetKey(olc::UP).bHeld)
             {
+                Player.SetAim(0, -1);
                 //lookUp
-                // Player.SetVelocity_Y(-6.0);
             }
             if (GetKey(olc::DOWN).bHeld)
             {
                 //crouch
                 // Player.SetVelocity_Y(-6.0);
-                if (GetKey(olc::X).bPressed)
+                if (GetKey(olc::X).bPressed && Player.GetOnGround())
                 {
                     //Get down
+                    Player.SetCollidesGround(false);
                 }
             }
+            else if (GetKey(olc::X).bPressed)
+            {
+                Player.Jump();
+            }
+            
             if (GetKey(olc::LEFT).bHeld)
             {
                 Player.SetVelocity_X(-2.0f);
                 Player.SetDirection(-1);
+                Player.SetAim(-1, 0);
             }
             if (GetKey(olc::RIGHT).bHeld)
             {
                 Player.SetVelocity_X(2.0f);
                 Player.SetDirection(1);
+                Player.SetAim(1, 0);
             }
-            if (GetKey(olc::X).bPressed)
+            if(GetKey(olc::RIGHT).bHeld && GetKey(olc::UP).bHeld)
             {
-                //jump
-                // if(Player.GetVelocity_Y() == 0)
-                // {
-                //     Player.AddToVelocity_Y(-3.0f);
-                // }
-                Player.Jump();
+                Player.SetAim(1 ,-1);
             }
+            if(GetKey(olc::LEFT).bHeld && GetKey(olc::UP).bHeld)
+            {
+                Player.SetAim(-1 ,-1);
+            }
+            if(GetKey(olc::RIGHT).bHeld && GetKey(olc::DOWN).bHeld)
+            {
+                Player.SetAim(1 ,1);
+
+            }
+            if(GetKey(olc::LEFT).bHeld && GetKey(olc::DOWN).bHeld)
+            {
+                Player.SetAim(-1 ,1);
+            }
+
+            //dejar de apuntar arriba abajo
+            if(GetKey(olc::UP).bReleased || GetKey(olc::DOWN).bReleased)
+            {
+                Player.SetAimY(0);
+                Player.SetAimX(Player.GetDirection());
+            }
+            if (Player.GetVelocity_Y() != 0 && GetKey(olc::DOWN).bPressed)
+            {
+                Player.SetAim(0, 1);
+            }
+
+            
+            if (GetKey(olc::Z).bHeld)
+            {
+                //shoot!!
+            }
+
         }
 
         //Gravity
@@ -160,7 +209,7 @@ public:
         //on Playermovement
 
         Player.PlayerMovement(fElapsedTime);
-        GroundCollision();
+        GroundCollision(fElapsedTime);
 
         //---------------------------------------------------------------------------------
         //link Camera to player position
@@ -186,7 +235,7 @@ public:
         float TileOffsetX = (OffSetX - (int)OffSetX) * TileWidth;
         float TileOffsetY = (OffSetY - (int)OffSetY) * TileHeight;
 
-        DrawSprite({-(int)OffSetX * TileWidth, 0}, BackgoundSprite);//Debug
+        //DrawSprite({-(int)OffSetX * TileWidth, 0}, BackgoundSprite);//Debug
 
 
         // //Draw visible Tile map
@@ -222,7 +271,14 @@ public:
 
 
         //Draw Player
-        FillRect((Player.GetX() - OffSetX) * TileWidth, (Player.GetY() - OffSetY) * TileHeight, 32, 42, olc::MAGENTA);
+        olc::vf2d PlayerPos = {(Player.GetX() - OffSetX) * TileWidth, (Player.GetY() - OffSetY) * TileHeight}; 
+        FillRect(PlayerPos.x, PlayerPos.y, 32, 42, olc::MAGENTA);
+
+        //Draw Aim
+        olc::vf2d aux = Player.GetAim();
+        //attach to player hitbox
+        olc::vf2d Crosshair = {(aux.x * 10) + PlayerPos.x + 32/2, (aux.y * 10) + PlayerPos.y + 42/2};
+        FillCircle(Crosshair, 1, olc::YELLOW);
 
 
         return true;

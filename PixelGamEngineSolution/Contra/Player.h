@@ -17,7 +17,8 @@ private:
     int Direction;
     
     bool bOnGround = false;
-    bool bGhost;
+    bool bIsGhost;
+    bool bCollidesGround = true;
 public:
 
     FPlayer() = default;
@@ -27,8 +28,8 @@ public:
         X = InX;
         Y = InY;
         Lives = 3;
-        Direction = 0;
-        bGhost = false;
+        Direction = 1;
+        bIsGhost = false;
     }
 
     //---------------------------------------------------------------------------------------------
@@ -172,5 +173,40 @@ public:
     void SetOnGround(bool InState)
     {
         bOnGround = InState;
+    }
+
+    //---------------------------------------------------------------------------------------------
+
+    olc::vf2d GetAim() const
+    {
+        return Aim;
+    }
+
+    void SetAim(const int AimX, const int AimY)
+    {
+        Aim.x = AimX;
+        Aim.y = AimY;
+    }
+
+    void SetAimX(const int AimX)
+    {
+        Aim.x = AimX;
+    }
+
+    void SetAimY(const int AimY)
+    {
+        Aim.y = AimY;
+    }
+
+    //---------------------------------------------------------------------------------------------
+
+    bool GetCollidesGround() const
+    {
+        return bCollidesGround;
+    }
+
+    void SetCollidesGround(const bool InState)
+    {
+        bCollidesGround = InState;
     }
 };
