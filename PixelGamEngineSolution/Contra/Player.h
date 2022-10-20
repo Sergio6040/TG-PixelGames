@@ -13,24 +13,39 @@ private:
     bool bIsGhost = false;
     bool bCollidesGround = true;
 
-    // const olc::vf2d Crosshair = {(Aim.x * 10) + PlayerPos.x + 32.f/2, (aux.y * 10) + PlayerPos.y + 42.f/2};
+    
 
 
 public:
-    FPlayer() = default;
+    FPlayer()
+    {
+        X = 0.0f;
+        Y = 0.0f;
+        VelX = 0.0f;
+        VelY = 0.0f;
+        Lives = 3;
+        Direction = 1;
+        bIsGhost = false;
+        Width = 32;
+        Height = 42;
+    };
     
     FPlayer(const float InX, const float InY)
     {
         X = InX;
         Y = InY;
+        VelX = 0.0f;
+        VelY = 0.0f;
         Lives = 3;
         Direction = 1;
         bIsGhost = false;
+        Width = 32;
+        Height = 42;
     }
 
     //---------------------------------------------------------------------------------------------
     
-    void PlayerMovement(const float fElapsedTime)
+    void UpdatePosition(const float fElapsedTime, const float InOffsetX, const float InOffsetY, const float InTileWidth, const float InTileHeight)
     {
         //Gravity
         VelY += Gravity * fElapsedTime;
@@ -46,6 +61,11 @@ public:
         }
 
         ClampVelocities();
+
+        AbsolutePosition = { (X - InOffsetX) * InTileWidth, (Y - InOffsetY) * InTileHeight };
+
+
+        Crosshair = { (Aim.x * 10) + AbsolutePosition.x + Width / 2, (Aim.y * 10) + AbsolutePosition.y + Height / 2 };
     }
 
     //---------------------------------------------------------------------------------------------
@@ -90,82 +110,82 @@ public:
         }
     }
 
-    //---------------------------------------------------------------------------------------------
-    
-    float GetX() const
-    {
-        return X;
-    }
+    ////---------------------------------------------------------------------------------------------
+    //
+    //float GetX() const
+    //{
+    //    return X;
+    //}
 
-    void SetX(const float InX)
-    {
-        X = InX;
-    }
+    //void SetX(const float InX)
+    //{
+    //    X = InX;
+    //}
 
-    //---------------------------------------------------------------------------------------------
+    ////---------------------------------------------------------------------------------------------
 
-    float GetY() const
-    {
-        return Y;
-    }
+    //float GetY() const
+    //{
+    //    return Y;
+    //}
 
-    void SetY(const float InY)
-    {
-        Y = InY;
-    }
+    //void SetY(const float InY)
+    //{
+    //    Y = InY;
+    //}
 
-    //---------------------------------------------------------------------------------------------
+    ////---------------------------------------------------------------------------------------------
 
-    int GetLives() const 
-    {
-        return Lives;
-    }
+    //int GetLives() const 
+    //{
+    //    return Lives;
+    //}
 
-    //---------------------------------------------------------------------------------------------
+    ////---------------------------------------------------------------------------------------------
 
-    int GetDirection() const
-    {
-        return Direction;
-    }
-    
-    void SetDirection(const int InDirection)
-    {
-        Direction = InDirection;
-    }
+    //int GetDirection() const
+    //{
+    //    return Direction;
+    //}
+    //
+    //void SetDirection(const int InDirection)
+    //{
+    //    Direction = InDirection;
+    //}
 
-    //---------------------------------------------------------------------------------------------
+    ////---------------------------------------------------------------------------------------------
 
-    float GetVelocity_X() const
-    {
-        return VelX;
-    }
-    
-    void SetVelocity_X(const float InVelocity)
-    {
-        VelX = InVelocity;
-    }
+    //float GetVelocity_X() const
+    //{
+    //    return VelX;
+    //}
+    //
+    //void SetVelocity_X(const float InVelocity)
+    //{
+    //    VelX = InVelocity;
+    //}
 
-    void AddToVelocity_X(const float InVelocity)
-    {
-        VelX += InVelocity;
-    }
+    //void AddToVelocity_X(const float InVelocity)
+    //{
+    //    VelX += InVelocity;
+    //}
 
-    //---------------------------------------------------------------------------------------------
+    ////---------------------------------------------------------------------------------------------
 
-    float GetVelocity_Y() const
-    {
-        return VelY;
-    }
-    
-    void SetVelocity_Y(const float InVelocity)
-    {
-        VelY = InVelocity;
-    }
-    
-    void AddToVelocity_Y(const float InVelocity)
-    {
-        VelY += InVelocity;
-    }
+    //float GetVelocity_Y() const
+    //{
+    //    return VelY;
+    //}
+    //
+    //void SetVelocity_Y(const float InVelocity)
+    //{
+    //    VelY = InVelocity;
+    //}
+    //
+    //void AddToVelocity_Y(const float InVelocity)
+    //{
+    //    VelY += InVelocity;
+    //}
 
     //---------------------------------------------------------------------------------------------
     
@@ -179,28 +199,28 @@ public:
         bOnGround = InState;
     }
 
-    //---------------------------------------------------------------------------------------------
+    ////---------------------------------------------------------------------------------------------
 
-    olc::vf2d GetAim() const
-    {
-        return Aim;
-    }
+    //olc::vf2d GetAim() const
+    //{
+    //    return Aim;
+    //}
 
-    void SetAim(const int AimX, const int AimY)
-    {
-        Aim.x = AimX;
-        Aim.y = AimY;
-    }
+    //void SetAim(const int AimX, const int AimY)
+    //{
+    //    Aim.x = AimX;
+    //    Aim.y = AimY;
+    //}
 
-    void SetAimX(const int AimX)
-    {
-        Aim.x = AimX;
-    }
+    //void SetAimX(const int AimX)
+    //{
+    //    Aim.x = AimX;
+    //}
 
-    void SetAimY(const int AimY)
-    {
-        Aim.y = AimY;
-    }
+    //void SetAimY(const int AimY)
+    //{
+    //    Aim.y = AimY;
+    //}
 
     //---------------------------------------------------------------------------------------------
 

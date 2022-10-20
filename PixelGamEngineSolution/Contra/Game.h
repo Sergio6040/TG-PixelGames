@@ -49,7 +49,7 @@ public:
          *  L -> Wall
          *  T -> Turret
          *  K -> hidden turret
-         * 
+         *  E -> enemy
          */
         Level += L".........................................................................................................L..";
         Level += L".........................................................................................................L..";
@@ -142,13 +142,11 @@ public:
     {
         Clear(olc::BLACK);
 
-        
+        if (IsFocused()) {
             Input.PlayerInput(Player);
+        }
         
         
-        //Update Player Position
-        Player.PlayerMovement(fElapsedTime);
-        GroundCollision(fElapsedTime);
 
         //---------------------------------------------------------------------------------
         //link Camera to player position
@@ -159,20 +157,21 @@ public:
         constexpr int TileWidth = 32;
         constexpr int TileHeight = 16;
         const int VisibleTilesX = ScreenWidth() / TileWidth; //8
-        int VisibleTilesY = ScreenHeight() / TileHeight; //7
+        int VisibleTilesY = ScreenHeight() / TileHeight; //14
 
-        float OffSetX = CameraX - (float)VisibleTilesX / 2.f; //offset de -4
-        float OffSetY = CameraY - (float)VisibleTilesY / 2.f; //no es necesario
+        float OffsetX = CameraX - (float)VisibleTilesX / 2.f; //offset de -4
+        float OffsetY = CameraY - (float)VisibleTilesY / 2.f; //no es necesario
 
         //camera clamp
-        if (OffSetX < 0) OffSetX = 0;
-        if (OffSetY < 0) OffSetY = 0;
-        if (OffSetX > LevelWidth - VisibleTilesX) OffSetX = LevelWidth - VisibleTilesX; //revisar!!!!
-        if (OffSetY > LevelHeight - VisibleTilesY) VisibleTilesY = LevelHeight - VisibleTilesY;
+        if (OffsetX < 0) OffsetX = 0;
+        if (OffsetY < 0) OffsetY = 0;
+        //clamp to level end
+        if (OffsetX > LevelWidth - VisibleTilesX) OffsetX = LevelWidth - VisibleTilesX; 
+        if (OffsetY > LevelHeight - VisibleTilesY) VisibleTilesY = LevelHeight - VisibleTilesY;
 
         //smooth offset
-        const float TileOffsetX = (OffSetX - (int)OffSetX) * TileWidth;
-        const float TileOffsetY = (OffSetY - (int)OffSetY) * TileHeight;
+        const float TileOffsetX = (OffsetX - (int)OffsetX) * TileWidth;
+        const float TileOffsetY = (OffsetY - (int)OffsetY) * TileHeight;
 
         //DrawSprite({-(int)OffSetX * TileWidth, 0}, BackgroundSprite);//Debug
 
@@ -182,7 +181,7 @@ public:
         {
             for (int y = -1; y < VisibleTilesY + 1; y++)
             {
-                const wchar_t TileId = GetTile(x + OffSetX, y + OffSetY);
+                const wchar_t TileId = GetTile(x + OffsetX, y + OffsetY);
                 switch (TileId)
                 {
                 case '0':
@@ -208,28 +207,32 @@ public:
 
         // DrawDecal({-OffSetX * TileWidth, 0}, BackGroundDecal);
 
+        //---------------------------------------------------------------------------------
+        Player.UpdatePosition(fElapsedTime, OffsetX, OffsetY, TileWidth, TileHeight);
+        GroundCollision(fElapsedTime);
+
 
         //-----------------------¡¡¡¡Change Names!!!!----------------------------------------------------
         
         //Draw Player
-        const olc::vf2d PlayerPos = {(Player.GetX() - OffSetX) * TileWidth, (Player.GetY() - OffSetY) * TileHeight}; 
-        FillRect(PlayerPos.x, PlayerPos.y, 32, 42, olc::MAGENTA);
+        //const olc::vf2d PlayerPos = {(Player.GetX() - OffSetX) * TileWidth, (Player.GetY() - OffSetY) * TileHeight}; 
+        FillRect(Player.GetAbsolutePosition().x, Player.GetAbsolutePosition().y, Player.GetWidth(), Player.GetHeight(), olc::MAGENTA);
 
         //Draw Aim
-        const olc::vf2d aux = Player.GetAim();
-        //attach to player hitbox
-        const olc::vf2d Crosshair = {(aux.x * 10) + PlayerPos.x + 32.f/2, (aux.y * 10) + PlayerPos.y + 42.f/2};
-        FillCircle(Crosshair, 1, olc::YELLOW);
+        //const olc::vf2d aux = Player.GetAim();
+        ////attach to player hitbox
+        //const olc::vf2d Crosshair = {(aux.x * 10) + PlayerPos.x + 32.f/2, (aux.y * 10) + PlayerPos.y + 42.f/2};
+        FillCircle(Player.GetCrosshair(), 1, olc::YELLOW);
 
         if (GetKey(olc::Z).bPressed)
         {
-            Shoot(Crosshair.x, Crosshair.y);   
+            Shoot(Player.GetCrosshair().x, Player.GetCrosshair().y);
         }
 
         for(FBullet& LoopBullet : PlayerBullets)
         {
             LoopBullet.UpdatePosition();
-            FillCircle(LoopBullet.X, LoopBullet.Y, 1, olc::RED);
+            FillCircle(LoopBullet.GetX(), LoopBullet.GetY(), 1, olc::RED);
         }
 
 

@@ -26,7 +26,6 @@ void FInputHandler::MovementInputs(FPlayer& Player) const
     if (PixelEngine->GetKey(olc::DOWN).bHeld)
     {
         //crouch
-        // Player.SetVelocity_Y(-6.0);
         if (PixelEngine->GetKey(olc::X).bPressed && Player.GetOnGround())
         {
             //Get down
