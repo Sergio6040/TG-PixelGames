@@ -13,9 +13,6 @@ private:
     bool bIsGhost = false;
     bool bCollidesGround = true;
 
-    
-
-
 public:
     FPlayer()
     {
@@ -64,7 +61,6 @@ public:
 
         AbsolutePosition = { (X - InOffsetX) * InTileWidth, (Y - InOffsetY) * InTileHeight };
 
-
         Crosshair = { (Aim.x * 10) + AbsolutePosition.x + Width / 2, (Aim.y * 10) + AbsolutePosition.y + Height / 2 };
     }
 
@@ -110,83 +106,6 @@ public:
         }
     }
 
-    ////---------------------------------------------------------------------------------------------
-    //
-    //float GetX() const
-    //{
-    //    return X;
-    //}
-
-    //void SetX(const float InX)
-    //{
-    //    X = InX;
-    //}
-
-    ////---------------------------------------------------------------------------------------------
-
-    //float GetY() const
-    //{
-    //    return Y;
-    //}
-
-    //void SetY(const float InY)
-    //{
-    //    Y = InY;
-    //}
-
-    ////---------------------------------------------------------------------------------------------
-
-    //int GetLives() const 
-    //{
-    //    return Lives;
-    //}
-
-    ////---------------------------------------------------------------------------------------------
-
-    //int GetDirection() const
-    //{
-    //    return Direction;
-    //}
-    //
-    //void SetDirection(const int InDirection)
-    //{
-    //    Direction = InDirection;
-    //}
-
-    ////---------------------------------------------------------------------------------------------
-
-    //float GetVelocity_X() const
-    //{
-    //    return VelX;
-    //}
-    //
-    //void SetVelocity_X(const float InVelocity)
-    //{
-    //    VelX = InVelocity;
-    //}
-
-    //void AddToVelocity_X(const float InVelocity)
-    //{
-    //    VelX += InVelocity;
-    //}
-
-    ////---------------------------------------------------------------------------------------------
-
-    //float GetVelocity_Y() const
-    //{
-    //    return VelY;
-    //}
-    //
-    //void SetVelocity_Y(const float InVelocity)
-    //{
-    //    VelY = InVelocity;
-    //}
-    //
-    //void AddToVelocity_Y(const float InVelocity)
-    //{
-    //    VelY += InVelocity;
-    //}
-
     //---------------------------------------------------------------------------------------------
     
     bool GetOnGround() const
@@ -198,29 +117,6 @@ public:
     {
         bOnGround = InState;
     }
-
-    ////---------------------------------------------------------------------------------------------
-
-    //olc::vf2d GetAim() const
-    //{
-    //    return Aim;
-    //}
-
-    //void SetAim(const int AimX, const int AimY)
-    //{
-    //    Aim.x = AimX;
-    //    Aim.y = AimY;
-    //}
-
-    //void SetAimX(const int AimX)
-    //{
-    //    Aim.x = AimX;
-    //}
-
-    //void SetAimY(const int AimY)
-    //{
-    //    Aim.y = AimY;
-    //}
 
     //---------------------------------------------------------------------------------------------
 

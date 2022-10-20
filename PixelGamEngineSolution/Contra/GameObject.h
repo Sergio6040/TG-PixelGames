@@ -17,8 +17,27 @@ protected:
 
     int Lives;
     int Direction;
+    int Id;
     
 public:
+
+    void UpdatePosition(const float InX, const float InY)
+    {
+        X = InX;
+        Y = InY;
+    }
+
+    void UpdatePosition(const float InX)
+    {
+        X = InX;
+    }
+    //---------------------------------------------------------------------------------------------
+
+    int GetID() const
+    {
+        return Id;
+    }
+
     //---------------------------------------------------------------------------------------------
 
     float GetX() const

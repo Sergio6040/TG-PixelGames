@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Player.h"
+#include "SteadyEnemy.h"
 #include "InputHandler.h"
 
 class FGame : public olc::PixelGameEngine
@@ -23,6 +24,8 @@ private:
     FInputHandler Input = nullptr;
 
     std::vector<FBullet> PlayerBullets;
+    std::vector<FGameObject> EnemyesArray;
+    std::vector<olc::vi2d> AlreadySpawned;
 
 public:
 
@@ -50,17 +53,19 @@ public:
          *  T -> Turret
          *  K -> hidden turret
          *  E -> enemy
+         *  R -> Runner Enemy
+         *  P -> Power Up
          */
         Level += L".........................................................................................................L..";
         Level += L".........................................................................................................L..";
         Level += L".........................................................................................................L..";
-        Level += L".........................................................................................................L..";
+        Level += L"........R..R.............................................................................................L..";
         Level += L"............................................GGGGGGGGGGGGGGG.....GGGGG.............GG.....................L..";
-        Level += L".........................................................................................................L..";
+        Level += L"......................R.....R........R...................................................................L..";
         Level += L".GGGGGGGGGGGGGGGGGGGGGGGBBBBGGGGGBBBBGGGGGGGG......T.....TGGGGGGG.....GG.........GG..GG...K.......GGGG...L..";
         Level += L".........................................................................................................L..";
-        Level += L".....GGG.....GG..................................PGGGGGGG.........G.GGG..GG..GG....G..GGGGG.....GG....G..L..";
-        Level += L".........................................................................................................L..";
+        Level += L".....GGG..T..GG......ER................T.........PGGGGGGG.........G.GGG..GG..GG....G..GGGGG.....GG....G..L..";
+        Level += L".........E...............................................................................................L..";
         Level += L"........G..G........GGG........................GG...........GG.GG......T..GG..GGG............GG..T.GGT.G.LGG";
         Level += L".........................................................................................................L..";
         Level += L"WWWWWWWWWGGWWWWWWWWGGWWWWWWWWWWWWWWWWWWWWWWWGGGWWWWWWWGGGGGG.............G...G....G......GGG......GGGGGGGG..";
@@ -205,23 +210,53 @@ public:
             }
         }
 
-        // DrawDecal({-OffSetX * TileWidth, 0}, BackGroundDecal);
+
+        //spawn enemies
+        for (int x = 0; x < VisibleTilesX; x++)
+        {
+            for (int y = 0; y < VisibleTilesY; y++)
+            {
+                olc::vi2d TilePostition = {x + (int)OffsetX, y + (int)OffsetY};
+                const wchar_t TileId = GetTile(TilePostition.x, TilePostition.y);
+				if (TileId == 'E' || TileId == 'R')
+				{
+					if (std::find(AlreadySpawned.begin(), AlreadySpawned.end(), TilePostition) == AlreadySpawned.end())
+					{
+						//element not found
+						AlreadySpawned.push_back(TilePostition);
+						EnemyesArray.push_back(FSteadyEnemy(x * TileWidth - TileOffsetX, y * TileHeight - TileOffsetY, x + (int)OffsetX));
+					}
+                    else
+                    {
+                        //element found
+                        for (FGameObject& Enemy : EnemyesArray)
+                        {
+                            if (Enemy.GetID() == TilePostition.x)
+                            {
+                                Enemy.UpdatePosition(x * TileWidth - TileOffsetX, y * TileHeight - TileOffsetY);
+                            }
+                        }
+                    }
+				}
+            }
+        }
+
+        //Draw enemies
+        for (FGameObject& Enemy : EnemyesArray)
+        {
+            FillRect(Enemy.GetX(), Enemy.GetY(), Enemy.GetWidth(), Enemy.GetHeight(), olc::RED);
+        }
+
+
+        //DrawDecal({-OffsetX * TileWidth, 0}, BackGroundDecal);
 
         //---------------------------------------------------------------------------------
         Player.UpdatePosition(fElapsedTime, OffsetX, OffsetY, TileWidth, TileHeight);
         GroundCollision(fElapsedTime);
 
 
-        //-----------------------¡¡¡¡Change Names!!!!----------------------------------------------------
         
-        //Draw Player
-        //const olc::vf2d PlayerPos = {(Player.GetX() - OffSetX) * TileWidth, (Player.GetY() - OffSetY) * TileHeight}; 
         FillRect(Player.GetAbsolutePosition().x, Player.GetAbsolutePosition().y, Player.GetWidth(), Player.GetHeight(), olc::MAGENTA);
-
-        //Draw Aim
-        //const olc::vf2d aux = Player.GetAim();
-        ////attach to player hitbox
-        //const olc::vf2d Crosshair = {(aux.x * 10) + PlayerPos.x + 32.f/2, (aux.y * 10) + PlayerPos.y + 42.f/2};
         FillCircle(Player.GetCrosshair(), 1, olc::YELLOW);
 
         if (GetKey(olc::Z).bPressed)
