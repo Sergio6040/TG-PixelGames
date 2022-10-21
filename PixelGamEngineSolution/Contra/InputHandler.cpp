@@ -78,7 +78,7 @@ void FInputHandler::DownInputs(FPlayer& Player) const
 
     if (PixelEngine->GetKey(olc::DOWN).bHeld)
     {
-        if (Player.GetOnGround() && Player.GetVelocity_X() == 0)
+        if (Player.GetOnGround() && Player.GetVelocity_X() == 0.f)
         {
             Player.SetAim(Player.GetDirection(), 0);
             Player.SetHitOffsetY(10.0f);

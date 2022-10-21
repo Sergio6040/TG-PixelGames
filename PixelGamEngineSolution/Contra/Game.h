@@ -3,11 +3,12 @@
 #include "Player.h"
 #include "SteadyEnemy.h"
 #include "InputHandler.h"
+#include "SpritesHandler.h"
 
 class FGame : public olc::PixelGameEngine
 {
 private:
-    olc::Sprite* BackgroundSprite = nullptr;
+    // olc::Sprite* BackgroundSprite = nullptr;
     olc::Decal* BackGroundDecal = nullptr;
 
     //javidx thing
@@ -20,8 +21,6 @@ private:
 
     float GroundCounter = 0.0f;
     float LevelStartOffsetX = 0.0f;
-    float LevelStartBoundsX = 0.0f;
-
 
     FPlayer Player ;
     FInputHandler Input = nullptr;
@@ -30,6 +29,8 @@ private:
     std::vector<FBullet> EnemyBullets;
     std::vector<FSteadyEnemy> EnemyesArray;
     std::vector<olc::vi2d> AlreadySpawned;
+
+    FSpritesHandler SpriteHandler;
 
 public:
 
@@ -42,8 +43,8 @@ public:
     
     virtual bool OnUserCreate() override
     {
-        BackgroundSprite = new olc::Sprite("./Assets/Level.png");
-        BackGroundDecal = new olc::Decal(BackgroundSprite);
+        // BackgroundSprite = new olc::Sprite("./Assets/Level.png");
+        BackGroundDecal = new olc::Decal(SpriteHandler.BackgroundSprite);
 
         LevelWidth = 108;
         LevelHeight = 14;
@@ -62,15 +63,15 @@ public:
          */
         Level += L".........................................................................................................L..";
         Level += L".........................................................................................................L..";
-        Level += L".........................................................................................................L..";
+        Level += L"..................................................................K......................................L..";
         Level += L"........R..R.............................................................................................L..";
-        Level += L"............................................GGGGGGGGGGGGGGG.....GGGGG.............GG.....................L..";
-        Level += L"......................R.....R........R...................................................................L..";
+        Level += L"......................R.....R........R......GGGGGGGGGGGGGGG.....GGGGG.............GG.....................L..";
+        Level += L".........................................................................................................L..";
         Level += L".GGGGGGGGGGGGGGGGGGGGGGGBBBBGGGGGBBBBGGGGGGGG......T.....TGGGGGGG.....GG.........GG..GG...K.......GGGG...L..";
         Level += L".........................................................................................................L..";
-        Level += L".....GGG..T..GG......ER................T.........PGGGGGGG.........G.GGG..GG..GG....G..GGGGG.....GG....G..L..";
-        Level += L".........E...............................................................................................L..";
-        Level += L"........G..G........GGG........................GG...........GG.GG......T..GG..GGG............GG..T.GGT.G.LGG";
+        Level += L".....GGG..P..GG.......R................T..........GGGGGGG.......K...GGG..GG..GG....G..GGGGG.....GG....G..L..";
+        Level += L".........E.......................................P................G......................................L..";
+        Level += L"........G..G.......EGGG........................GG...........GG.GG......P..GG..GGG............GG..T.GGT.G.LGG";
         Level += L".........................................................................................................L..";
         Level += L"WWWWWWWWWGGWWWWWWWWGGWWWWWWWWWWWWWWWWWWWWWWWGGGWWWWWWWGGGGGG.............G...G....G......GGG......GGGGGGGG..";
         Level += L"GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG..................................................L..";
@@ -132,7 +133,6 @@ public:
                 else
                 {
                     GroundCounter += fElapsedTime;
-                    std::cout << GroundCounter << std::endl;
                     if (GroundCounter > 0.65f)
                     {
                         Player.SetCollidesGround(true);
@@ -157,9 +157,21 @@ public:
         PlayerBullets.push_back(FBullet(InX, InY, Player.GetAim()));
     }
 
-    void EnemyShoot(FSteadyEnemy& InEnemy)
+    void EnemyShoot(FSteadyEnemy& InEnemy, const float fElapsedTime)
     {
-        EnemyBullets.push_back(FBullet(InEnemy.GetCrosshair().x, InEnemy.GetCrosshair().y, InEnemy.GetAim()));
+        InEnemy.AddToShootCoolDown(-fElapsedTime);
+        if(InEnemy.GetShootCoolDown() <= 0.0f)
+        {
+            EnemyBullets.push_back(FBullet(InEnemy.GetCrosshair().x, InEnemy.GetCrosshair().y, InEnemy.GetAim()));
+            InEnemy.AddToShootCount(1);
+            InEnemy.SetShootCoolDown(0.3f);
+
+            if(InEnemy.GetShootCount() >= 3)
+            {
+                InEnemy.SetShootCoolDown(2.0f);
+                InEnemy.SetShootCount(0);
+            }
+        }
     }
 
     void BulletCollision(FBullet& InBullet)
@@ -195,7 +207,7 @@ public:
         constexpr int TileWidth = 32;
         constexpr int TileHeight = 16;
         const int VisibleTilesX = ScreenWidth() / TileWidth; //8
-        int VisibleTilesY = ScreenHeight() / TileHeight; //14
+        const int VisibleTilesY = ScreenHeight() / TileHeight; //14
 
         float OffsetX = CameraX - (float)VisibleTilesX / 2.f; //offset de -4
 
@@ -289,16 +301,17 @@ public:
         {
             FillRect(Enemy.GetX(), Enemy.GetY(), Enemy.GetWidth(), Enemy.GetHeight(), olc::DARK_CYAN);
             Enemy.AimToPlayer(Player);
+            EnemyShoot(Enemy, fElapsedTime);
             FillCircle(Enemy.GetCrosshair(), 1, olc::YELLOW);
         }
 
         //romove Enemy
-        if (EnemyesArray.size() > 0)
+        if (!EnemyesArray.empty())
         {
-            auto i = std::remove_if(EnemyesArray.begin(), EnemyesArray.end(),
-                [&](FGameObject Enemy)
+            const auto i = std::remove_if(EnemyesArray.begin(), EnemyesArray.end(),
+                [&](const FGameObject& Enemy)
                 {
-                    return (Enemy.GetX() / TileWidth < -0.9);
+                    return (Enemy.GetX() / (float)TileWidth < -0.9f);
                 }
             );
             if (i != EnemyesArray.end())
@@ -308,10 +321,10 @@ public:
         }
 
         //remove bullet
-        if (PlayerBullets.size() > 0)
+        if (!PlayerBullets.empty())
         {
-            auto i = std::remove_if(PlayerBullets.begin(), PlayerBullets.end(),
-                [&](FBullet Bullet)
+            const auto i = std::remove_if(PlayerBullets.begin(), PlayerBullets.end(),
+                [&](const FBullet& Bullet)
                 {
                     return (Bullet.GetX() < 0 || Bullet.GetX() > ScreenWidth() ||
                             Bullet.GetY() < 0 || Bullet.GetY() > ScreenHeight());
@@ -347,6 +360,12 @@ public:
         }
 
         for(FBullet& LoopBullet : PlayerBullets)
+        {
+            LoopBullet.UpdatePosition();
+            FillCircle(LoopBullet.GetX(), LoopBullet.GetY(), 1, olc::WHITE);
+        }
+
+        for(FBullet& LoopBullet : EnemyBullets)
         {
             LoopBullet.UpdatePosition();
             FillCircle(LoopBullet.GetX(), LoopBullet.GetY(), 1, olc::RED);

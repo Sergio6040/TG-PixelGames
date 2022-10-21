@@ -23,6 +23,9 @@ protected:
 
 public:
 
+	FGameObject(): X(0), Y(0), VelX(0), VelY(0), Width(0), Height(0), Lives(0), Direction(0), Id(0), bIsDead(false) {}
+	
+
 	void UpdatePosition(const float InX, const float InY)
 	{
 		if (!bIsDead)

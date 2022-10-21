@@ -8,7 +8,7 @@ private:
     
     float JumpForce = 5.0f;
     float Gravity = 5.0f;
-    float HitRadius = 8.0f;
+    float HitRadius = 7.0f;
 
     olc::vf2d HitPosition;
     float HitOffsetY = 0.0f;
