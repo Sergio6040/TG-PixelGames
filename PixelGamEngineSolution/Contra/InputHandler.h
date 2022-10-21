@@ -20,4 +20,7 @@ public:
     void TwoInputs(FPlayer& Player) const;
 
     void StopAiming(FPlayer& Player) const;
+    
+    void DownInputs(FPlayer& Player) const;
+
 };

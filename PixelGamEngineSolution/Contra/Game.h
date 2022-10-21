@@ -18,13 +18,17 @@ private:
     float CameraX = 0.0f;
     float CameraY = 0.0f;
 
-    float GroundCounter = 0;
+    float GroundCounter = 0.0f;
+    float LevelStartOffsetX = 0.0f;
+    float LevelStartBoundsX = 0.0f;
+
 
     FPlayer Player ;
     FInputHandler Input = nullptr;
 
     std::vector<FBullet> PlayerBullets;
-    std::vector<FGameObject> EnemyesArray;
+    std::vector<FBullet> EnemyBullets;
+    std::vector<FSteadyEnemy> EnemyesArray;
     std::vector<olc::vi2d> AlreadySpawned;
 
 public:
@@ -138,9 +142,38 @@ public:
         }
     }
 
-    void Shoot(const float InX, const float InY)
+    void ClampPlayer(const float InOffsetX)
+    {
+        if (Player.GetX() <= InOffsetX + 0.5f)
+        {
+            Player.SetX(InOffsetX + 0.52f);
+            Player.SetVelocity_X(0);
+            //wiggle <--- needs fix
+        }
+    }
+
+    void PlayerShoot(const float InX, const float InY)
     {
         PlayerBullets.push_back(FBullet(InX, InY, Player.GetAim()));
+    }
+
+    void EnemyShoot(FSteadyEnemy& InEnemy)
+    {
+        EnemyBullets.push_back(FBullet(InEnemy.GetCrosshair().x, InEnemy.GetCrosshair().y, InEnemy.GetAim()));
+    }
+
+    void BulletCollision(FBullet& InBullet)
+    {
+        for (FGameObject& Enemy : EnemyesArray) 
+        {
+            if (InBullet.GetX() > Enemy.GetX() && InBullet.GetX() < Enemy.GetX() + Enemy.GetWidth() && 
+                InBullet.GetY() > Enemy.GetY() && InBullet.GetY() < Enemy.GetY() + Enemy.GetHeight())
+            {
+                Enemy.SetIsDead(true);
+                Enemy.SetX(-100);
+                InBullet.SetX(-150);
+            }
+        }
     }
 
     bool OnUserUpdate(float fElapsedTime) override
@@ -165,46 +198,56 @@ public:
         int VisibleTilesY = ScreenHeight() / TileHeight; //14
 
         float OffsetX = CameraX - (float)VisibleTilesX / 2.f; //offset de -4
-        float OffsetY = CameraY - (float)VisibleTilesY / 2.f; //no es necesario
 
         //camera clamp
-        if (OffsetX < 0) OffsetX = 0;
-        if (OffsetY < 0) OffsetY = 0;
+        if (OffsetX <= LevelStartOffsetX)
+        {
+            OffsetX = LevelStartOffsetX;
+        }
+        else
+        {
+            LevelStartOffsetX = OffsetX;
+        }
+        ClampPlayer(OffsetX);
+        
         //clamp to level end
-        if (OffsetX > LevelWidth - VisibleTilesX) OffsetX = LevelWidth - VisibleTilesX; 
-        if (OffsetY > LevelHeight - VisibleTilesY) VisibleTilesY = LevelHeight - VisibleTilesY;
-
+        if (OffsetX > LevelWidth - VisibleTilesX)
+        {
+            OffsetX = LevelWidth - VisibleTilesX;
+        }
+       
         //smooth offset
         const float TileOffsetX = (OffsetX - (int)OffsetX) * TileWidth;
-        const float TileOffsetY = (OffsetY - (int)OffsetY) * TileHeight;
+
 
         //DrawSprite({-(int)OffSetX * TileWidth, 0}, BackgroundSprite);//Debug
 
+        //std::cout << Player.GetX() << " | " << OffsetX + 0.5f << std::endl;
 
         // //Draw visible Tile map
         for (int x = -1; x < VisibleTilesX + 1; x++)
         {
             for (int y = -1; y < VisibleTilesY + 1; y++)
             {
-                const wchar_t TileId = GetTile(x + OffsetX, y + OffsetY);
+                const wchar_t TileId = GetTile(x + OffsetX, y + 0.0f);
                 switch (TileId)
                 {
                 case '0':
-                    DrawRect(x * TileWidth - TileOffsetX, y * TileHeight - TileOffsetY, 32, 32, olc::CYAN);
+                    DrawRect(x * TileWidth - TileOffsetX, y * TileHeight, 32, 32, olc::CYAN);
                     break;
                 case 'G':
-                    DrawRect(x * TileWidth - TileOffsetX, y * TileHeight - TileOffsetY, 32, 32, olc::RED);
+                    DrawRect(x * TileWidth - TileOffsetX, y * TileHeight, 32, 32, olc::RED);
                     break;
                 case 'W':
 
-                    DrawRect(x * TileWidth - TileOffsetX, y * TileHeight - TileOffsetY, 32, 32, olc::BLUE);
+                    DrawRect(x * TileWidth - TileOffsetX, y * TileHeight, 32, 32, olc::BLUE);
                     break;
                 case 'B':
-                    DrawRect(x * TileWidth - TileOffsetX, y * TileHeight - TileOffsetY, 32, 32, olc::GREY);
+                    DrawRect(x * TileWidth - TileOffsetX, y * TileHeight, 32, 32, olc::GREY);
 
                     break;
                 default:
-                    DrawRect(x * TileWidth - TileOffsetX, y * TileHeight - TileOffsetY, 32, 32);
+                    DrawRect(x * TileWidth - TileOffsetX, y * TileHeight, 32, 32);
                 }
                 
             }
@@ -216,7 +259,7 @@ public:
         {
             for (int y = 0; y < VisibleTilesY; y++)
             {
-                olc::vi2d TilePostition = {x + (int)OffsetX, y + (int)OffsetY};
+                olc::vi2d TilePostition = {x + (int)OffsetX, y};
                 const wchar_t TileId = GetTile(TilePostition.x, TilePostition.y);
 				if (TileId == 'E' || TileId == 'R')
 				{
@@ -224,7 +267,7 @@ public:
 					{
 						//element not found
 						AlreadySpawned.push_back(TilePostition);
-						EnemyesArray.push_back(FSteadyEnemy(x * TileWidth - TileOffsetX, y * TileHeight - TileOffsetY, x + (int)OffsetX));
+						EnemyesArray.push_back(FSteadyEnemy(x * TileWidth - TileOffsetX, (y + 0.4f) * TileHeight, x + (int)OffsetX));
 					}
                     else
                     {
@@ -233,7 +276,7 @@ public:
                         {
                             if (Enemy.GetID() == TilePostition.x)
                             {
-                                Enemy.UpdatePosition(x * TileWidth - TileOffsetX, y * TileHeight - TileOffsetY);
+                                Enemy.UpdatePosition(x * TileWidth - TileOffsetX, (y + 0.4f) * TileHeight);
                             }
                         }
                     }
@@ -242,26 +285,65 @@ public:
         }
 
         //Draw enemies
-        for (FGameObject& Enemy : EnemyesArray)
+        for (FSteadyEnemy& Enemy : EnemyesArray)
         {
-            FillRect(Enemy.GetX(), Enemy.GetY(), Enemy.GetWidth(), Enemy.GetHeight(), olc::RED);
+            FillRect(Enemy.GetX(), Enemy.GetY(), Enemy.GetWidth(), Enemy.GetHeight(), olc::DARK_CYAN);
+            Enemy.AimToPlayer(Player);
+            FillCircle(Enemy.GetCrosshair(), 1, olc::YELLOW);
+        }
+
+        //romove Enemy
+        if (EnemyesArray.size() > 0)
+        {
+            auto i = std::remove_if(EnemyesArray.begin(), EnemyesArray.end(),
+                [&](FGameObject Enemy)
+                {
+                    return (Enemy.GetX() / TileWidth < -0.9);
+                }
+            );
+            if (i != EnemyesArray.end())
+            {
+                EnemyesArray.erase(i);
+            }
+        }
+
+        //remove bullet
+        if (PlayerBullets.size() > 0)
+        {
+            auto i = std::remove_if(PlayerBullets.begin(), PlayerBullets.end(),
+                [&](FBullet Bullet)
+                {
+                    return (Bullet.GetX() < 0 || Bullet.GetX() > ScreenWidth() ||
+                            Bullet.GetY() < 0 || Bullet.GetY() > ScreenHeight());
+                }
+            );
+            if (i != PlayerBullets.end())
+            {
+                PlayerBullets.erase(i);
+            }
+        }
+
+        for (FBullet& Bullet : PlayerBullets)
+        {
+            BulletCollision(Bullet);
         }
 
 
         //DrawDecal({-OffsetX * TileWidth, 0}, BackGroundDecal);
 
         //---------------------------------------------------------------------------------
-        Player.UpdatePosition(fElapsedTime, OffsetX, OffsetY, TileWidth, TileHeight);
+        Player.UpdatePosition(fElapsedTime, OffsetX, TileWidth, TileHeight);
         GroundCollision(fElapsedTime);
 
 
         
         FillRect(Player.GetAbsolutePosition().x, Player.GetAbsolutePosition().y, Player.GetWidth(), Player.GetHeight(), olc::MAGENTA);
         FillCircle(Player.GetCrosshair(), 1, olc::YELLOW);
+        DrawCircle(Player.GetHitPosition(), Player.GetHitRadius(), olc::WHITE);
 
         if (GetKey(olc::Z).bPressed)
         {
-            Shoot(Player.GetCrosshair().x, Player.GetCrosshair().y);
+            PlayerShoot(Player.GetCrosshair().x, Player.GetCrosshair().y);
         }
 
         for(FBullet& LoopBullet : PlayerBullets)

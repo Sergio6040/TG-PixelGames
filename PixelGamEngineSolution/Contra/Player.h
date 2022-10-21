@@ -8,10 +8,15 @@ private:
     
     float JumpForce = 5.0f;
     float Gravity = 5.0f;
+    float HitRadius = 8.0f;
+
+    olc::vf2d HitPosition;
+    float HitOffsetY = 0.0f;
 
     bool bOnGround = false;
     bool bIsGhost = false;
     bool bCollidesGround = true;
+    bool bIsCrouched = false;
 
 public:
     FPlayer()
@@ -25,7 +30,8 @@ public:
         bIsGhost = false;
         Width = 32;
         Height = 42;
-    };
+        Aim = { 1, 0 };
+    }
     
     FPlayer(const float InX, const float InY)
     {
@@ -38,11 +44,12 @@ public:
         bIsGhost = false;
         Width = 32;
         Height = 42;
+        Aim = { 1, 0 };
     }
 
     //---------------------------------------------------------------------------------------------
     
-    void UpdatePosition(const float fElapsedTime, const float InOffsetX, const float InOffsetY, const float InTileWidth, const float InTileHeight)
+    void UpdatePosition(const float fElapsedTime, const float InOffsetX, const float InTileWidth, const float InTileHeight)
     {
         //Gravity
         VelY += Gravity * fElapsedTime;
@@ -59,9 +66,11 @@ public:
 
         ClampVelocities();
 
-        AbsolutePosition = { (X - InOffsetX) * InTileWidth, (Y - InOffsetY) * InTileHeight };
+        AbsolutePosition = { (X - InOffsetX) * InTileWidth, (Y) * InTileHeight };
 
-        Crosshair = { (Aim.x * 10) + AbsolutePosition.x + Width / 2, (Aim.y * 10) + AbsolutePosition.y + Height / 2 };
+        HitPosition = { AbsolutePosition.x + Width / 2 , (AbsolutePosition.y + Height / 2) + HitOffsetY };
+
+        Crosshair = { (Aim.x * 10) + HitPosition.x, (Aim.y * 10) + HitPosition.y };
     }
 
     //---------------------------------------------------------------------------------------------
@@ -129,4 +138,53 @@ public:
     {
         bCollidesGround = InState;
     }
+
+    //---------------------------------------------------------------------------------------------
+
+    float GetHitRadius() const
+    {
+        return HitRadius;
+    }
+
+    void SetRadius(const float InRadius)
+    {
+        HitRadius = InRadius;
+    }
+
+    //---------------------------------------------------------------------------------------------
+
+    olc::vf2d GetHitPosition() const
+    {
+        return HitPosition;
+    }
+
+    void SetHitPosition(const float InX, const float InY)
+    {
+        HitPosition = {InX, InY};
+    }
+
+    //---------------------------------------------------------------------------------------------
+
+    float GetHitOffsetY() const
+    {
+        return HitOffsetY;
+    }
+
+    void SetHitOffsetY(const float InOffset)
+    {
+        HitOffsetY = InOffset;
+    }
+
+    //---------------------------------------------------------------------------------------------
+
+    bool GetIsCrouched() const
+    {
+        return bIsCrouched;
+    }
+
+    void SetIsCrouched(bool InState)
+    {
+        bIsCrouched = InState;
+    }
+
 };
