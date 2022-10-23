@@ -6,7 +6,7 @@ class FBullet : public FGameObject
     float Speed = 0.3f;
 public:
 
-    FBullet(const float InX, const float InY, const olc::vi2d& InAim)
+    FBullet(const float InX, const float InY, const olc::vf2d& InAim)
     {
         X = InX;
         Y = InY;

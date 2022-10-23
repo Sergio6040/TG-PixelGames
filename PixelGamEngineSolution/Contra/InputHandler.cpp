@@ -74,8 +74,6 @@ void FInputHandler::StopAiming(FPlayer& Player) const
 
 void FInputHandler::DownInputs(FPlayer& Player) const
 {
-    std::cout << Player.GetVelocity_X() << std::endl;
-
     if (PixelEngine->GetKey(olc::DOWN).bHeld)
     {
         if (Player.GetOnGround() && Player.GetVelocity_X() == 0.f)
