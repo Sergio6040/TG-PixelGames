@@ -33,14 +33,15 @@ public:
     {
         if(InPlayer.GetX() >= X)
         {
-            VectorToPlayer.x = X - InPlayer.GetAbsolutePosition().x;
-            VectorToPlayer.y = Y - InPlayer.GetAbsolutePosition().y;
+            Direction = 1;
         }
         else
         {
-            VectorToPlayer.x = InPlayer.GetAbsolutePosition().x - X;
-            VectorToPlayer.y = InPlayer.GetAbsolutePosition().y - Y;
+            Direction = -1;
         }
+
+        VectorToPlayer.x = InPlayer.GetAbsolutePosition().x - X;
+        VectorToPlayer.y = InPlayer.GetAbsolutePosition().y - Y;
         
         DistanceToPlayer = (float)sqrt(pow(VectorToPlayer.x, 2) + pow(VectorToPlayer.y, 2));
 

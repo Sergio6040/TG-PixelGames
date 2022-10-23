@@ -64,8 +64,8 @@ public:
         Level += L".........................................................................................................L..";
         Level += L".........................................................................................................L..";
         Level += L"..................................................................K......................................L..";
-        Level += L"........R..R.............................................................................................L..";
-        Level += L"......................R.....R........R......GGGGGGGGGGGGGGG.....GGGGG.............GG.....................L..";
+        Level += L"......................R.....R........R...................................................................L..";
+        Level += L"............................................GGGGGGGGGGGGGGG.....GGGGG.............GG.....................L..";
         Level += L".........................................................................................................L..";
         Level += L".GGGGGGGGGGGGGGGGGGGGGGGBBBBGGGGGBBBBGGGGGGGG......T.....TGGGGGGG.....GG.........GG..GG...K.......GGGG...L..";
         Level += L".........................................................................................................L..";
@@ -159,9 +159,11 @@ public:
 
     void EnemyShoot(FSteadyEnemy& InEnemy, const float fElapsedTime)
     {
+        std::cout << InEnemy.GetAim() << std::endl;
         InEnemy.AddToShootCoolDown(-fElapsedTime);
         if(InEnemy.GetShootCoolDown() <= 0.0f)
         {
+            
             EnemyBullets.push_back(FBullet(InEnemy.GetCrosshair().x, InEnemy.GetCrosshair().y, InEnemy.GetAim()));
             InEnemy.AddToShootCount(1);
             InEnemy.SetShootCoolDown(0.3f);
@@ -336,9 +338,30 @@ public:
             }
         }
 
+        //remove bullet
+        if (!EnemyBullets.empty())
+        {
+            const auto i = std::remove_if(EnemyBullets.begin(), EnemyBullets.end(),
+                [&](const FBullet& Bullet)
+                {
+                    return (Bullet.GetX() < 0 || Bullet.GetX() > ScreenWidth() ||
+                        Bullet.GetY() < 0 || Bullet.GetY() > ScreenHeight());
+                }
+            );
+            if (i != EnemyBullets.end())
+            {
+                EnemyBullets.erase(i);
+            }
+        }
+
         for (FBullet& Bullet : PlayerBullets)
         {
             BulletCollision(Bullet);
+        }
+
+        for (FBullet& Bullet : EnemyBullets)
+        {
+            std::cout << Bullet.GetAim() << std::endl;
         }
 
 
