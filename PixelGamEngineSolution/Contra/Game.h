@@ -8,21 +8,40 @@
 class FGame : public olc::PixelGameEngine
 {
 private:
-    // olc::Sprite* BackgroundSprite = nullptr;
     olc::Decal* BackGroundDecal = nullptr;
+    olc::Decal* PlayerIdleDecal = nullptr;
+    olc::Decal* PlayerRunDecal = nullptr;
+    olc::Decal* PlayerShootRunDecal = nullptr;
+    olc::Decal* PlayerJumpDecal = nullptr;
+    olc::Decal* PlayerCrouchDecal = nullptr;
+    olc::Decal* PlayerAimDownDecal = nullptr;
+    olc::Decal* PlayerAimUpDecal = nullptr;
+    olc::Decal* PlayerRunAimUpDecal = nullptr;
+    olc::Decal* PlayerDyingDecal = nullptr;
+    olc::Decal* PlayerDeadDecal = nullptr;
+    olc::Decal* MedalDecal = nullptr;
+    olc::Decal* BulletDecal = nullptr;
+    olc::Decal* Bullet2Decal = nullptr;
 
-    //javidx thing
     std::wstring Level;
-    int LevelWidth = 0;
-    int LevelHeight = 0;
+    int LevelWidth;
+    int LevelHeight;
 
-    float CameraX = 0.0f;
-    float CameraY = 0.0f;
+    float CameraX;
+    float CameraY;
 
-    float GroundCounter = 0.0f;
-    float LevelStartOffsetX = 0.0f;
+    int TileWidth;
+    int TileHeight;
+    int VisibleTilesX;
+    int VisibleTilesY;
+    float TileOffsetX;
 
-    FPlayer Player ;
+    float OffsetX;
+
+    float GroundCounter;
+    float LevelStartOffsetX;
+
+    FPlayer Player;
     FInputHandler Input = nullptr;
 
     std::vector<FBullet> PlayerBullets;
@@ -37,14 +56,39 @@ public:
     FGame()
     {
         sAppName = "Contra from outer space: The Game";
-        Player = FPlayer(1, 0);
-        Input = FInputHandler(this);
+        LevelWidth = 0;
+        LevelHeight = 0;
+        CameraX = 0.f;
+        CameraY = 0.f;
+        TileWidth = 32;
+        TileHeight = 16;
+        VisibleTilesX = 0;
+        VisibleTilesY = 0;
+        TileOffsetX = 0.f;
+        OffsetX = 0.f;
+        GroundCounter = 0.f;
+        LevelStartOffsetX = 0.f;
     }
-    
+
     virtual bool OnUserCreate() override
     {
-        // BackgroundSprite = new olc::Sprite("./Assets/Level.png");
         BackGroundDecal = new olc::Decal(SpriteHandler.BackgroundSprite);
+        PlayerIdleDecal = new olc::Decal(SpriteHandler.PlayerIdleSprite);
+        PlayerRunDecal = new olc::Decal(SpriteHandler.PlayerRunSprite);
+        PlayerShootRunDecal = new olc::Decal(SpriteHandler.PlayerShootRunSprite);
+        PlayerJumpDecal = new olc::Decal(SpriteHandler.PlayerJumpSprite);
+        PlayerCrouchDecal = new olc::Decal(SpriteHandler.PlayerCrouchSprite);
+        PlayerAimDownDecal = new olc::Decal(SpriteHandler.PlayerAimDownSprite);
+        PlayerAimUpDecal = new olc::Decal(SpriteHandler.PlayerAimUpSprite);
+        PlayerRunAimUpDecal = new olc::Decal(SpriteHandler.PlayerRunAimUpSprite);
+        PlayerDyingDecal = new olc::Decal(SpriteHandler.PlayerDyingSprite);
+        PlayerDeadDecal = new olc::Decal(SpriteHandler.PlayerDeadSprite);
+        MedalDecal = new olc::Decal(SpriteHandler.MedalSprite);
+        BulletDecal = new olc::Decal(SpriteHandler.BulletSprite);
+        Bullet2Decal = new olc::Decal(SpriteHandler.Bullet2Sprite);
+
+        Player = FPlayer(1, 0);
+        Input = FInputHandler(this);
 
         LevelWidth = 108;
         LevelHeight = 14;
@@ -103,7 +147,7 @@ public:
     {
         return (GetTile(Player.GetX() + X1, Player.GetY() + Y1) == Character || GetTile(Player.GetX() + X2, Player.GetY() + Y2) == Character);
     }
-    
+
     void GroundCollision(const float fElapsedTime)
     {
         Player.SetOnGround(false);
@@ -123,11 +167,11 @@ public:
                 // GetTile(Player.GetX(), Player.GetY() + 1) == L'G' || GetTile(Player.GetX() + 0.9f, Player.GetY() + 1) == L'G' ||
                 // GetTile(Player.GetX(), Player.GetY() + 1) == L'B' || GetTile(Player.GetX() + 0.9f, Player.GetY() + 1) == L'B')
             {
-                if(Player.GetCollidesGround())
+                if (Player.GetCollidesGround())
                 {
                     Player.SetY((int)Player.GetY() + 0.4f);
                     Player.SetVelocity_Y(0);
-                    Player.SetOnGround(true);  
+                    Player.SetOnGround(true);
                     GroundCounter = 0;
                 }
                 else
@@ -144,9 +188,9 @@ public:
 
     void ClampPlayer(const float InOffsetX)
     {
-        if (Player.GetX() <= InOffsetX + 0.5f)
+        if (Player.GetX() <= InOffsetX + 0.3f)
         {
-            Player.SetX(InOffsetX + 0.52f);
+            Player.SetX(InOffsetX + 0.32f);
             Player.SetVelocity_X(0);
             //wiggle <--- needs fix
         }
@@ -159,16 +203,14 @@ public:
 
     void EnemyShoot(FSteadyEnemy& InEnemy, const float fElapsedTime)
     {
-        std::cout << InEnemy.GetAim() << std::endl;
         InEnemy.AddToShootCoolDown(-fElapsedTime);
-        if(InEnemy.GetShootCoolDown() <= 0.0f)
+        if (InEnemy.GetShootCoolDown() <= 0.0f)
         {
-            
             EnemyBullets.push_back(FBullet(InEnemy.GetCrosshair().x, InEnemy.GetCrosshair().y, InEnemy.GetAim()));
             InEnemy.AddToShootCount(1);
             InEnemy.SetShootCoolDown(0.3f);
 
-            if(InEnemy.GetShootCount() >= 3)
+            if (InEnemy.GetShootCount() >= 3)
             {
                 InEnemy.SetShootCoolDown(2.0f);
                 InEnemy.SetShootCount(0);
@@ -176,11 +218,11 @@ public:
         }
     }
 
-    void BulletCollision(FBullet& InBullet)
+    void PlayerBulletCollision(FBullet& InBullet)
     {
-        for (FGameObject& Enemy : EnemyesArray) 
+        for (FGameObject& Enemy : EnemyesArray)
         {
-            if (InBullet.GetX() > Enemy.GetX() && InBullet.GetX() < Enemy.GetX() + Enemy.GetWidth() && 
+            if (InBullet.GetX() > Enemy.GetX() && InBullet.GetX() < Enemy.GetX() + Enemy.GetWidth() &&
                 InBullet.GetY() > Enemy.GetY() && InBullet.GetY() < Enemy.GetY() + Enemy.GetHeight())
             {
                 Enemy.SetIsDead(true);
@@ -190,28 +232,13 @@ public:
         }
     }
 
-    bool OnUserUpdate(float fElapsedTime) override
+    void MoveLevel()
     {
-        Clear(olc::BLACK);
-
-        if (IsFocused()) {
-            Input.PlayerInput(Player);
-        }
-        
-        
-
-        //---------------------------------------------------------------------------------
-        //link Camera to player position
         CameraX = Player.GetX();
-        CameraY = 0.0f;
 
-        //
-        constexpr int TileWidth = 32;
-        constexpr int TileHeight = 16;
-        const int VisibleTilesX = ScreenWidth() / TileWidth; //8
-        const int VisibleTilesY = ScreenHeight() / TileHeight; //14
-
-        float OffsetX = CameraX - (float)VisibleTilesX / 2.f; //offset de -4
+        VisibleTilesX = ScreenWidth() / TileWidth; //8
+        VisibleTilesY = ScreenHeight() / TileHeight; //14
+        OffsetX = CameraX - (float)VisibleTilesX / 2.f; //offset de -4
 
         //camera clamp
         if (OffsetX <= LevelStartOffsetX)
@@ -223,22 +250,20 @@ public:
             LevelStartOffsetX = OffsetX;
         }
         ClampPlayer(OffsetX);
-        
+
         //clamp to level end
         if (OffsetX > LevelWidth - VisibleTilesX)
         {
             OffsetX = LevelWidth - VisibleTilesX;
         }
-       
+
         //smooth offset
-        const float TileOffsetX = (OffsetX - (int)OffsetX) * TileWidth;
+        TileOffsetX = (OffsetX - (int)OffsetX) * TileWidth;
+    }
 
-
-        //DrawSprite({-(int)OffSetX * TileWidth, 0}, BackgroundSprite);//Debug
-
-        //std::cout << Player.GetX() << " | " << OffsetX + 0.5f << std::endl;
-
-        // //Draw visible Tile map
+    void DrawDebugMode()
+    {
+        //Draw visible Tile map
         for (int x = -1; x < VisibleTilesX + 1; x++)
         {
             for (int y = -1; y < VisibleTilesY + 1; y++)
@@ -263,26 +288,30 @@ public:
                 default:
                     DrawRect(x * TileWidth - TileOffsetX, y * TileHeight, 32, 32);
                 }
-                
+
             }
         }
+        FillRect(Player.GetAbsolutePosition().x, Player.GetAbsolutePosition().y, Player.GetWidth(), Player.GetHeight(), olc::MAGENTA);
+        FillCircle(Player.GetCrosshair(), 1, olc::YELLOW);
+        DrawCircle(Player.GetHitPosition(), Player.GetHitRadius(), olc::WHITE);
+    }
 
-
-        //spawn enemies
+    void SpawnEnemies()
+    {
         for (int x = 0; x < VisibleTilesX; x++)
         {
             for (int y = 0; y < VisibleTilesY; y++)
             {
-                olc::vi2d TilePostition = {x + (int)OffsetX, y};
+                olc::vi2d TilePostition = { x + (int)OffsetX, y };
                 const wchar_t TileId = GetTile(TilePostition.x, TilePostition.y);
-				if (TileId == 'E' || TileId == 'R')
-				{
-					if (std::find(AlreadySpawned.begin(), AlreadySpawned.end(), TilePostition) == AlreadySpawned.end())
-					{
-						//element not found
-						AlreadySpawned.push_back(TilePostition);
-						EnemyesArray.push_back(FSteadyEnemy(x * TileWidth - TileOffsetX, (y + 0.4f) * TileHeight, x + (int)OffsetX));
-					}
+                if (TileId == 'E' || TileId == 'R')
+                {
+                    if (std::find(AlreadySpawned.begin(), AlreadySpawned.end(), TilePostition) == AlreadySpawned.end())
+                    {
+                        //element not found
+                        AlreadySpawned.push_back(TilePostition);
+                        EnemyesArray.push_back(FSteadyEnemy(x * TileWidth - TileOffsetX, (y + 0.4f) * TileHeight, x + (int)OffsetX));
+                    }
                     else
                     {
                         //element found
@@ -294,20 +323,26 @@ public:
                             }
                         }
                     }
-				}
+                }
             }
         }
+    }
 
-        //Draw enemies
-        for (FSteadyEnemy& Enemy : EnemyesArray)
+    template <typename T>
+    void RemoveElement(std::vector<T>& InVector, const std::function<void(FGameObject)>& Lambda)
+    {
+        if (!InVector.empty())
         {
-            FillRect(Enemy.GetX(), Enemy.GetY(), Enemy.GetWidth(), Enemy.GetHeight(), olc::DARK_CYAN);
-            Enemy.AimToPlayer(Player);
-            EnemyShoot(Enemy, fElapsedTime);
-            FillCircle(Enemy.GetCrosshair(), 1, olc::YELLOW);
+            const auto i = std::remove_if(InVector.begin(), InVector.end(), Lambda);
+            if (i != InVector.end())
+            {
+                InVector.erase(i);
+            }
         }
+    }
 
-        //romove Enemy
+    void RemoveEnemy()
+    {
         if (!EnemyesArray.empty())
         {
             const auto i = std::remove_if(EnemyesArray.begin(), EnemyesArray.end(),
@@ -321,15 +356,17 @@ public:
                 EnemyesArray.erase(i);
             }
         }
+    }
 
-        //remove bullet
+    void RemoveBullets()
+    {
         if (!PlayerBullets.empty())
         {
             const auto i = std::remove_if(PlayerBullets.begin(), PlayerBullets.end(),
                 [&](const FBullet& Bullet)
                 {
                     return (Bullet.GetX() < 0 || Bullet.GetX() > ScreenWidth() ||
-                            Bullet.GetY() < 0 || Bullet.GetY() > ScreenHeight());
+                        Bullet.GetY() < 0 || Bullet.GetY() > ScreenHeight());
                 }
             );
             if (i != PlayerBullets.end())
@@ -338,7 +375,6 @@ public:
             }
         }
 
-        //remove bullet
         if (!EnemyBullets.empty())
         {
             const auto i = std::remove_if(EnemyBullets.begin(), EnemyBullets.end(),
@@ -353,45 +389,66 @@ public:
                 EnemyBullets.erase(i);
             }
         }
+    }
 
-        for (FBullet& Bullet : PlayerBullets)
-        {
-            BulletCollision(Bullet);
+    bool OnUserUpdate(float fElapsedTime) override
+    {
+        Clear(olc::BLACK);
+
+        if (IsFocused()) {
+            Input.PlayerInput(Player);
         }
-
-        for (FBullet& Bullet : EnemyBullets)
-        {
-            std::cout << Bullet.GetAim() << std::endl;
-        }
-
-
-        //DrawDecal({-OffsetX * TileWidth, 0}, BackGroundDecal);
-
-        //---------------------------------------------------------------------------------
-        Player.UpdatePosition(fElapsedTime, OffsetX, TileWidth, TileHeight);
-        GroundCollision(fElapsedTime);
-
-
-        
-        FillRect(Player.GetAbsolutePosition().x, Player.GetAbsolutePosition().y, Player.GetWidth(), Player.GetHeight(), olc::MAGENTA);
-        FillCircle(Player.GetCrosshair(), 1, olc::YELLOW);
-        DrawCircle(Player.GetHitPosition(), Player.GetHitRadius(), olc::WHITE);
 
         if (GetKey(olc::Z).bPressed)
         {
             PlayerShoot(Player.GetCrosshair().x, Player.GetCrosshair().y);
         }
 
-        for(FBullet& LoopBullet : PlayerBullets)
+        MoveLevel();
+
+        SpawnEnemies();
+
+        RemoveEnemy();
+        //RemoveElement<FSteadyEnemy>(EnemyesArray, [&](const FGameObject& Element) {return Element.GetX() / (float)TileWidth < -0.9f;});
+
+        RemoveBullets();
+
+        Player.UpdatePosition(fElapsedTime, OffsetX, TileWidth, TileHeight);
+        GroundCollision(fElapsedTime);
+
+        //Draw
+        DrawDecal({ -OffsetX * TileWidth, 0 }, BackGroundDecal);
+
+        if (Player.GetDirection() < 0)
         {
-            LoopBullet.UpdatePosition();
-            FillCircle(LoopBullet.GetX(), LoopBullet.GetY(), 1, olc::WHITE);
+            DrawPartialDecal({ Player.GetAbsolutePosition().x + 32, Player.GetAbsolutePosition().y }, PlayerIdleDecal, { 0, 0 }, { 32, 42 }, { (float)Player.GetDirection(), 1.f });
+        }
+        else
+        {
+            DrawPartialDecal(Player.GetAbsolutePosition(), PlayerIdleDecal, { 0, 0 }, { 32, 42 }, { (float)Player.GetDirection(), 1.f });
         }
 
-        for(FBullet& LoopBullet : EnemyBullets)
+
+        //Draw enemies
+        for (FSteadyEnemy& Enemy : EnemyesArray)
+        {
+            DrawPartialDecal({ Enemy.GetX() + 32, Enemy.GetY()}, PlayerIdleDecal, {0, 0}, {32, 42}, {(float)Enemy.GetDirection(), 1.f});
+            Enemy.AimToPlayer(Player);
+            EnemyShoot(Enemy, fElapsedTime);
+            FillCircle(Enemy.GetCrosshair(), 1, olc::YELLOW);
+        }
+
+        for (FBullet& LoopBullet : PlayerBullets)
         {
             LoopBullet.UpdatePosition();
-            FillCircle(LoopBullet.GetX(), LoopBullet.GetY(), 1, olc::RED);
+            PlayerBulletCollision(LoopBullet);
+            DrawDecal({ LoopBullet.GetX(), LoopBullet.GetY() }, BulletDecal);
+        }
+
+        for (FBullet& LoopBullet : EnemyBullets)
+        {
+            LoopBullet.UpdatePosition();
+            DrawDecal({ LoopBullet.GetX(), LoopBullet.GetY() }, BulletDecal);
         }
 
 
