@@ -9,6 +9,7 @@ private:
     float JumpForce = 5.0f;
     float Gravity = 5.0f;
     float HitRadius = 7.0f;
+    float GhostCounter = 0.0f;
 
     olc::vf2d HitPosition;
     float HitOffsetY = 0.0f;
@@ -17,6 +18,8 @@ private:
     bool bIsGhost = false;
     bool bCollidesGround = true;
     bool bIsCrouched = false;
+    bool bIsShooting = false;
+    bool bIsMoving = false;
 
 public:
     FPlayer()
@@ -77,11 +80,19 @@ public:
 
     void Jump()
     {
-        // VelY += JumpForce
         if(VelY == 0.0f)
         {
             AddToVelocity_Y(-JumpForce);
         }
+    }
+
+    //---------------------------------------------------------------------------------------------
+
+    void Respawn()
+    {
+        bIsDead = false;
+        X = 1;
+        Y = 0;
     }
 
     //---------------------------------------------------------------------------------------------
@@ -91,7 +102,6 @@ public:
     //     InBulletStorage.push_back(FBullet());
     // }
 
-    
     //---------------------------------------------------------------------------------------------
     
     void ClampVelocities()
@@ -185,6 +195,30 @@ public:
     void SetIsCrouched(bool InState)
     {
         bIsCrouched = InState;
+    }
+
+    //---------------------------------------------------------------------------------------------
+
+    bool GetIsShooting() const
+    {
+        return bIsShooting;
+    }
+
+    void SetIsShooting(const bool InState)
+    {
+        bIsShooting = InState;
+    }
+
+    //---------------------------------------------------------------------------------------------
+
+    bool GetIsMoving() const
+    {
+        return bIsMoving;
+    }
+
+    void SetIsMoving(const bool InState)
+    {
+        bIsMoving = InState;
     }
 
 };

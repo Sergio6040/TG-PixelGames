@@ -2,17 +2,15 @@
 
 void FInputHandler::PlayerInput(FPlayer& Player) const
 {
-    MovementInputs(Player);
-
-    TwoInputs(Player);
-
-    StopAiming(Player);
-
-    DownInputs(Player);
-
-    if (PixelEngine->GetKey(olc::Z).bHeld)
+    if (!Player.GetIsDead())
     {
-        //shoot!!
+        MovementInputs(Player);
+
+        TwoInputs(Player);
+
+        StopAiming(Player);
+
+        DownInputs(Player);
     }
 }
 
@@ -23,15 +21,17 @@ void FInputHandler::MovementInputs(FPlayer& Player) const
         //Look Up
         Player.SetAim(0, -1);
     }
-
+    Player.SetIsMoving(false);
     if (PixelEngine->GetKey(olc::LEFT).bHeld && !Player.GetIsCrouched())
     {
+        Player.SetIsMoving(true);
         Player.SetVelocity_X(-2.0f);
         Player.SetDirection(-1);
         Player.SetAim(-1, 0);
     }
     if (PixelEngine->GetKey(olc::RIGHT).bHeld && !Player.GetIsCrouched())
     {
+        Player.SetIsMoving(true);
         Player.SetVelocity_X(2.0f);
         Player.SetDirection(1);
         Player.SetAim(1, 0);

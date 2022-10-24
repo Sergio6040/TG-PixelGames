@@ -77,6 +77,16 @@ public:
 		return Lives;
 	}
 
+	void SetLives(const int InValue)
+	{
+		Lives = InValue;
+	}
+
+	void AddToLives(const int InValue)
+	{
+		Lives += InValue;
+	}
+
 	//---------------------------------------------------------------------------------------------
 
 	int GetDirection() const

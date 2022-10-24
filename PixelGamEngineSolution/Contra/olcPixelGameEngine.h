@@ -783,11 +783,12 @@ namespace olc
 	class Decal
 	{
 	public:
-		Decal(olc::Sprite* spr, bool filter = false, bool clamp = true);
+		Decal(olc::Sprite* spr, const int InWidth = 0, bool filter = false, bool clamp = true);
 		Decal(const uint32_t nExistingTextureResource, olc::Sprite* spr);
 		virtual ~Decal();
 		void Update();
 		void UpdateSprite();
+		int width;
 
 	public: // But dont touch
 		int32_t id = -1;
@@ -1509,8 +1510,9 @@ namespace olc
 	// O------------------------------------------------------------------------------O
 	// | olc::Decal IMPLEMENTATION                                                    |
 	// O------------------------------------------------------------------------------O
-	Decal::Decal(olc::Sprite* spr, bool filter, bool clamp)
+	Decal::Decal(olc::Sprite* spr, const int InWidth, bool filter, bool clamp)
 	{
+		width = InWidth;
 		id = -1;
 		if (spr == nullptr) return;
 		sprite = spr;
