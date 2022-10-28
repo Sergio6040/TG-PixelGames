@@ -3,7 +3,7 @@
 
 class FBullet : public FGameObject
 {
-    float Speed = 0.2f;
+    float Speed = 200.f;
 public:
 
     FBullet(const float InX, const float InY, const olc::vf2d& InAim)
@@ -15,10 +15,10 @@ public:
         VelY = Speed * Aim.y;
     }
 
-    void UpdatePosition()
+    void UpdatePosition(const float fElapsedTime)
     {
-        X += VelX;
-        Y += VelY;
+        X += VelX * fElapsedTime;
+        Y += VelY * fElapsedTime;
     }
     
 };

@@ -20,5 +20,8 @@ struct FSpritesHandler
 
 	olc::Sprite* BulletSprite = new olc::Sprite("./Assets/Bullet.png");
 	olc::Sprite* Bullet2Sprite = new olc::Sprite("./Assets/Bullet2.png");
+
+	olc::Sprite* EnemyIdleSprite = new olc::Sprite("./Assets/Clown_1.png");
+
 };
 

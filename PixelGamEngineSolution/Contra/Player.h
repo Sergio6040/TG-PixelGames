@@ -6,8 +6,8 @@ class FPlayer : public FGameObject
 {
 private:
     
-    float JumpForce = 5.0f;
-    float Gravity = 5.0f;
+    float JumpForce = 6.0f;
+    float Gravity = 9.0f;
     float HitRadius = 7.0f;
     float GhostCounter = 0.0f;
 

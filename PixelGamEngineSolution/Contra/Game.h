@@ -23,6 +23,8 @@ private:
 	olc::Decal* BulletDecal = nullptr;
 	olc::Decal* Bullet2Decal = nullptr;
 
+	olc::Decal* EnemyIdleDeclal = nullptr;
+
 	std::wstring Level;
 	int LevelWidth;
 	int LevelHeight;
@@ -100,6 +102,8 @@ public:
 
 		BulletDecal = new olc::Decal(SpriteHandler.BulletSprite);
 		Bullet2Decal = new olc::Decal(SpriteHandler.Bullet2Sprite);
+
+		EnemyIdleDeclal = new olc::Decal(SpriteHandler.EnemyIdleSprite);
 
 		SelectedDecal = nullptr;
 
@@ -547,7 +551,18 @@ public:
 		//Draw enemies
 		for (FSteadyEnemy& Enemy : EnemyesArray)
 		{
-			DrawPartialDecal({ Enemy.GetX() + 32, Enemy.GetY() }, PlayerIdleDecal, { 0, 0 }, { 32, 42 }, { (float)Enemy.GetDirection(), 1.f });
+			float PositionOffsetX;
+			if(Enemy.GetDirection() < 0)
+			{
+				PositionOffsetX = 32.f;
+			}
+			else
+			{
+				{
+					PositionOffsetX = 0.f;
+				}
+			}
+			DrawPartialDecal({ Enemy.GetX() + PositionOffsetX, Enemy.GetY() }, EnemyIdleDeclal, { 0, 0 }, { 32, 42 }, { (float)Enemy.GetDirection(), 1.f });
 			Enemy.AimToPlayer(Player);
 			EnemyShoot(Enemy, fElapsedTime);
 			FillCircle(Enemy.GetCrosshair(), 1, olc::YELLOW);
@@ -555,14 +570,14 @@ public:
 
 		for (FBullet& LoopBullet : PlayerBullets)
 		{
-			LoopBullet.UpdatePosition();
+			LoopBullet.UpdatePosition(fElapsedTime);
 			PlayerBulletCollision(LoopBullet);
 			DrawDecal({ LoopBullet.GetX(), LoopBullet.GetY() }, BulletDecal);
 		}
 
 		for (FBullet& LoopBullet : EnemyBullets)
 		{
-			LoopBullet.UpdatePosition();
+			LoopBullet.UpdatePosition(fElapsedTime);
 			EnemyBulletCollision(LoopBullet);
 			DrawDecal({ LoopBullet.GetX(), LoopBullet.GetY() }, BulletDecal);
 		}
