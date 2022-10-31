@@ -22,6 +22,31 @@ struct FSpritesHandler
 	olc::Sprite* Bullet2Sprite = new olc::Sprite("./Assets/Bullet2.png");
 
 	olc::Sprite* EnemyIdleSprite = new olc::Sprite("./Assets/Clown_1.png");
+	olc::Sprite* EnemyDownSprite = new olc::Sprite("./Assets/Clown_1_Down.png");
+	olc::Sprite* EnemyUpSprite = new olc::Sprite("./Assets/Clown_1_Up.png");
+
+	olc::Sprite* EndGameSprite = new olc::Sprite("./Assets/EndGame.png");
+
+	~FSpritesHandler()
+	{
+		delete BackgroundSprite;
+		delete PlayerIdleSprite;
+		delete PlayerRunSprite;
+		delete PlayerShootRunSprite;
+		delete PlayerJumpSprite;
+		delete PlayerCrouchSprite;
+		delete PlayerAimDownSprite;
+		delete PlayerAimUpSprite;
+		delete PlayerRunAimUpSprite;
+		delete PlayerDyingSprite;
+		delete PlayerDeadSprite;
+		delete MedalSprite;
+		delete BulletSprite;
+		delete Bullet2Sprite;
+		delete EnemyIdleSprite;
+		delete EnemyDownSprite;
+		delete EnemyUpSprite;
+	}
 
 };
 

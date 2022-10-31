@@ -23,196 +23,95 @@ protected:
 
 public:
 
-	FGameObject(): X(0), Y(0), VelX(0), VelY(0), Width(0), Height(0), Lives(0), Direction(0), Id(0), bIsDead(false) {}
-	
+	FGameObject() : X(0), Y(0), VelX(0), VelY(0), Width(0), Height(0), Lives(0), Direction(0), Id(0), bIsDead(false) {}
 
-	void UpdatePosition(const float InX, const float InY)
-	{
-		if (!bIsDead)
-		{
-			X = InX;
-			Y = InY;
-		}
-	}
+	void UpdatePosition(const float InX, const float InY);
 
-	void UpdatePosition(const float InX)
-	{
-		X = InX;
-	}
-	//---------------------------------------------------------------------------------------------
-
-	int GetID() const
-	{
-		return Id;
-	}
+	void UpdatePosition(const float InX);
 
 	//---------------------------------------------------------------------------------------------
 
-	float GetX() const
-	{
-		return X;
-	}
-
-	void SetX(const float InX)
-	{
-		X = InX;
-	}
+	int GetID() const;
 
 	//---------------------------------------------------------------------------------------------
 
-	float GetY() const
-	{
-		return Y;
-	}
+	float GetX() const;
 
-	void SetY(const float InY)
-	{
-		Y = InY;
-	}
+	void SetX(const float InX);
 
 	//---------------------------------------------------------------------------------------------
 
-	int GetLives() const
-	{
-		return Lives;
-	}
+	float GetY() const;
 
-	void SetLives(const int InValue)
-	{
-		Lives = InValue;
-	}
-
-	void AddToLives(const int InValue)
-	{
-		Lives += InValue;
-	}
+	void SetY(const float InY);
 
 	//---------------------------------------------------------------------------------------------
 
-	int GetDirection() const
-	{
-		return Direction;
-	}
+	int GetLives() const;
 
-	void SetDirection(const int InDirection)
-	{
-		Direction = InDirection;
-	}
+	void SetLives(const int InValue);
+
+	void AddToLives(const int InValue);
 
 	//---------------------------------------------------------------------------------------------
 
-	float GetVelocity_X() const
-	{
-		return VelX;
-	}
+	int GetDirection() const;
 
-	void SetVelocity_X(const float InVelocity)
-	{
-		VelX = InVelocity;
-	}
-
-	void AddToVelocity_X(const float InVelocity)
-	{
-		VelX += InVelocity;
-	}
+	void SetDirection(const int InDirection);
 
 	//---------------------------------------------------------------------------------------------
 
-	float GetVelocity_Y() const
-	{
-		return VelY;
-	}
+	float GetVelocity_X() const;
 
-	void SetVelocity_Y(const float InVelocity)
-	{
-		VelY = InVelocity;
-	}
+	void SetVelocity_X(const float InVelocity);
 
-	void AddToVelocity_Y(const float InVelocity)
-	{
-		VelY += InVelocity;
-	}
+	void AddToVelocity_X(const float InVelocity);
 
 	//---------------------------------------------------------------------------------------------
 
-	olc::vf2d GetAim() const
-	{
-		return Aim;
-	}
+	float GetVelocity_Y() const;
 
-	void SetAim(const int AimX, const int AimY)
-	{
-		Aim.x = AimX;
-		Aim.y = AimY;
-	}
+	void SetVelocity_Y(const float InVelocity);
 
-	void SetAimX(const int AimX)
-	{
-		Aim.x = AimX;
-	}
-
-	void SetAimY(const int AimY)
-	{
-		Aim.y = AimY;
-	}
+	void AddToVelocity_Y(const float InVelocity);
 
 	//---------------------------------------------------------------------------------------------
 
-	float GetWidth() const
-	{
-		return Width;
-	}
+	olc::vf2d GetAim() const;
 
-	void SetWidth(const float InWidth)
-	{
-		Width = InWidth;
-	}
+	void SetAim(const int AimX, const int AimY);
+
+	void SetAimX(const int AimX);
+
+	void SetAimY(const int AimY);
 
 	//---------------------------------------------------------------------------------------------
 
-	float GetHeight() const
-	{
-		return Height;
-	}
+	float GetWidth() const;
 
-	void SetHeight(const float InHeight)
-	{
-		Height = InHeight;
-	}
+	void SetWidth(const float InWidth);
 
 	//---------------------------------------------------------------------------------------------
 
-	olc::vf2d GetAbsolutePosition() const
-	{
-		return AbsolutePosition;
-	}
+	float GetHeight() const;
 
-	void SetAbsolutePosition(const float InX, const float InY)
-	{
-		AbsolutePosition = { InX, InY };
-	}
+	void SetHeight(const float InHeight);
 
 	//---------------------------------------------------------------------------------------------
 
-	olc::vf2d GetCrosshair() const
-	{
-		return Crosshair;
-	}
+	olc::vf2d GetAbsolutePosition() const;
 
-	void SetCrosshair(const float InX, const float InY)
-	{
-		Crosshair = { InX, InY };
-	}
+	void SetAbsolutePosition(const float InX, const float InY);
 
 	//---------------------------------------------------------------------------------------------
 
-	bool GetIsDead() const
-	{
-		return bIsDead;
-	}
+	olc::vf2d GetCrosshair() const;
 
-	void SetIsDead(const bool InState)
-	{
-		bIsDead = InState;
-	}
+	void SetCrosshair(const float InX, const float InY);
+
+	//---------------------------------------------------------------------------------------------
+
+	bool GetIsDead() const;
+
+	void SetIsDead(const bool InState);
 };

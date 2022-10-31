@@ -5,220 +5,103 @@
 class FPlayer : public FGameObject
 {
 private:
-    
-    float JumpForce = 6.0f;
-    float Gravity = 9.0f;
-    float HitRadius = 7.0f;
-    float GhostCounter = 0.0f;
 
-    olc::vf2d HitPosition;
-    float HitOffsetY = 0.0f;
+	float JumpForce = 6.0f;
+	float Gravity = 9.0f;
+	float HitRadius = 7.0f;
+	float GhostCounter = 0.0f;
 
-    bool bOnGround = false;
-    bool bIsGhost = false;
-    bool bCollidesGround = true;
-    bool bIsCrouched = false;
-    bool bIsShooting = false;
-    bool bIsMoving = false;
+	olc::vf2d HitPosition;
+	float HitOffsetY = 0.0f;
+
+	bool bOnGround = false;
+	bool bIsGhost = false;
+	bool bCollidesGround = true;
+	bool bIsCrouched = false;
+	bool bIsShooting = false;
+	bool bIsMoving = false;
 
 public:
-    FPlayer()
-    {
-        X = 0.0f;
-        Y = 0.0f;
-        VelX = 0.0f;
-        VelY = 0.0f;
-        Lives = 3;
-        Direction = 1;
-        bIsGhost = false;
-        Width = 32;
-        Height = 42;
-        Aim = { 1, 0 };
-    }
-    
-    FPlayer(const float InX, const float InY)
-    {
-        X = InX;
-        Y = InY;
-        VelX = 0.0f;
-        VelY = 0.0f;
-        Lives = 3;
-        Direction = 1;
-        bIsGhost = false;
-        Width = 32;
-        Height = 42;
-        Aim = { 1, 0 };
-    }
+	FPlayer();
 
-    //---------------------------------------------------------------------------------------------
-    
-    void UpdatePosition(const float fElapsedTime, const float InOffsetX, const float InTileWidth, const float InTileHeight)
-    {
-        //Gravity
-        VelY += Gravity * fElapsedTime;
+	FPlayer(const float InX, const float InY);
 
-        //Position
-        X += VelX * fElapsedTime;
-        Y += VelY * fElapsedTime;
+	//---------------------------------------------------------------------------------------------
 
-        //Stop Movement
-        if(bOnGround)
-        {
-            VelX = 0.0f;
-        }
+	void UpdatePosition(const float fElapsedTime, const float InOffsetX, const float InTileWidth, const float InTileHeight);
 
-        ClampVelocities();
+	//---------------------------------------------------------------------------------------------
 
-        AbsolutePosition = { (X - InOffsetX) * InTileWidth, (Y) * InTileHeight };
+	void Jump();
 
-        HitPosition = { AbsolutePosition.x + Width / 2 , (AbsolutePosition.y + Height / 2) + HitOffsetY };
+	//---------------------------------------------------------------------------------------------
 
-        Crosshair = { (Aim.x * 10) + HitPosition.x, (Aim.y * 10) + HitPosition.y };
-    }
+	void Respawn();
 
-    //---------------------------------------------------------------------------------------------
+	//---------------------------------------------------------------------------------------------
 
-    void Jump()
-    {
-        if(VelY == 0.0f)
-        {
-            AddToVelocity_Y(-JumpForce);
-        }
-    }
+	void ClampVelocities();
 
-    //---------------------------------------------------------------------------------------------
+	//---------------------------------------------------------------------------------------------
 
-    void Respawn()
-    {
-        bIsDead = false;
-        X = 1;
-        Y = 0;
-    }
+	bool GetOnGround() const;
 
-    //---------------------------------------------------------------------------------------------
+	void SetOnGround(bool InState);
 
-    // void Shoot(std::vector<FBullet>& InBulletStorage)
-    // {
-    //     InBulletStorage.push_back(FBullet());
-    // }
+	//---------------------------------------------------------------------------------------------
 
-    //---------------------------------------------------------------------------------------------
-    
-    void ClampVelocities()
-    {
-        if(VelX > 10.0f)
-        {
-            VelX = 10.0f;
-        }
-        if(VelX < -10.0f)
-        {
-            VelX = -10.0f;
-        }
+	bool GetIsGhost() const;
 
-        if(VelY > 10.0f)
-        {
-            VelY = 10.0f;
-        }
-        if(VelY < -10.0f)
-        {
-            VelY = -10.0f;
-        }
-    }
+	void SetIsGhost(bool InState);
 
-    //---------------------------------------------------------------------------------------------
-    
-    bool GetOnGround() const
-    {
-        return bOnGround;
-    }
+	//---------------------------------------------------------------------------------------------
 
-    void SetOnGround(bool InState)
-    {
-        bOnGround = InState;
-    }
+	float GetGhostCounter() const;
 
-    //---------------------------------------------------------------------------------------------
+	void SetGhostCounter(const float InValue);
 
-    bool GetCollidesGround() const
-    {
-        return bCollidesGround;
-    }
+	void AddToGhostCounter(const float InValue);
 
-    void SetCollidesGround(const bool InState)
-    {
-        bCollidesGround = InState;
-    }
+	//---------------------------------------------------------------------------------------------
 
-    //---------------------------------------------------------------------------------------------
+	bool GetCollidesGround() const;
 
-    float GetHitRadius() const
-    {
-        return HitRadius;
-    }
+	void SetCollidesGround(const bool InState);
 
-    void SetRadius(const float InRadius)
-    {
-        HitRadius = InRadius;
-    }
+	//---------------------------------------------------------------------------------------------
 
-    //---------------------------------------------------------------------------------------------
+	float GetHitRadius() const;
 
-    olc::vf2d GetHitPosition() const
-    {
-        return HitPosition;
-    }
+	void SetRadius(const float InRadius);
 
-    void SetHitPosition(const float InX, const float InY)
-    {
-        HitPosition = {InX, InY};
-    }
+	//---------------------------------------------------------------------------------------------
 
-    //---------------------------------------------------------------------------------------------
+	olc::vf2d GetHitPosition() const;
 
-    float GetHitOffsetY() const
-    {
-        return HitOffsetY;
-    }
+	void SetHitPosition(const float InX, const float InY);
 
-    void SetHitOffsetY(const float InOffset)
-    {
-        HitOffsetY = InOffset;
-    }
+	//---------------------------------------------------------------------------------------------
 
-    //---------------------------------------------------------------------------------------------
+	float GetHitOffsetY() const;
 
-    bool GetIsCrouched() const
-    {
-        return bIsCrouched;
-    }
+	void SetHitOffsetY(const float InOffset);
 
-    void SetIsCrouched(bool InState)
-    {
-        bIsCrouched = InState;
-    }
+	//---------------------------------------------------------------------------------------------
 
-    //---------------------------------------------------------------------------------------------
+	bool GetIsCrouched() const;
 
-    bool GetIsShooting() const
-    {
-        return bIsShooting;
-    }
+	void SetIsCrouched(bool InState);
 
-    void SetIsShooting(const bool InState)
-    {
-        bIsShooting = InState;
-    }
+	//---------------------------------------------------------------------------------------------
 
-    //---------------------------------------------------------------------------------------------
+	bool GetIsShooting() const;
 
-    bool GetIsMoving() const
-    {
-        return bIsMoving;
-    }
+	void SetIsShooting(const bool InState);
 
-    void SetIsMoving(const bool InState)
-    {
-        bIsMoving = InState;
-    }
+	//---------------------------------------------------------------------------------------------
+
+	bool GetIsMoving() const;
+
+	void SetIsMoving(const bool InState);
 
 };
